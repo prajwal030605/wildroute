@@ -94,11 +94,11 @@ export default function Navbar() {
 
         {/* CTA */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/#waitlist" style={{
+          <Link href="/register" style={{
             background: "#1D9E75", color: "#fff", padding: "8px 18px",
             borderRadius: 8, fontSize: 13, fontWeight: 500, textDecoration: "none",
           }}>
-            Join waitlist
+            Register Now
           </Link>
           {/* Mobile hamburger */}
           <button

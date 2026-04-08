@@ -89,6 +89,7 @@ export default function AgencyOnboardingPage() {
   const [website, setWebsite] = useState("");
   const [foundedYear, setFoundedYear] = useState("");
   const [coverImage, setCoverImage] = useState("");
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [panNo, setPanNo] = useState("");
   const [gstNo, setGstNo] = useState("");
 
@@ -137,6 +138,35 @@ export default function AgencyOnboardingPage() {
 
     setRegistrationId(generateRegistrationId());
   }, []);
+
+  async function uploadCoverImage(file: File) {
+    setError("");
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image must be smaller than 5MB.");
+      return;
+    }
+    setUploadingCover(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const safeEmail = (email || "anon").replace(/[^a-z0-9]/gi, "_");
+      const path = `${safeEmail}/cover-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("agency-images")
+        .upload(path, file, { upsert: true, cacheControl: "3600" });
+      if (upErr) {
+        setError("Upload failed: " + upErr.message);
+        return;
+      }
+      const { data } = supabase.storage.from("agency-images").getPublicUrl(path);
+      setCoverImage(data.publicUrl);
+    } finally {
+      setUploadingCover(false);
+    }
+  }
 
   function toggleActivity(activity: ActivityType) {
     setActivities(prev =>
@@ -486,8 +516,53 @@ export default function AgencyOnboardingPage() {
                       </div>
                     </div>
                     <div>
-                      <label style={labelStyle}>Cover Image URL</label>
-                      <input type="url" placeholder="https://images.unsplash.com/..." value={coverImage} onChange={e => setCoverImage(e.target.value)} style={inputStyle} />
+                      <label style={labelStyle}>Cover Image</label>
+                      {coverImage ? (
+                        <div style={{
+                          position: "relative", borderRadius: 10, overflow: "hidden",
+                          border: "1px solid #222", marginBottom: 8,
+                        }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={coverImage} alt="Cover preview" style={{
+                            width: "100%", height: 180, objectFit: "cover", display: "block",
+                          }} />
+                          <button
+                            type="button"
+                            onClick={() => setCoverImage("")}
+                            style={{
+                              position: "absolute", top: 8, right: 8,
+                              background: "rgba(0,0,0,0.7)", color: "#fff", border: "1px solid #333",
+                              borderRadius: 6, padding: "6px 12px", fontSize: 11, cursor: "pointer",
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <label style={{
+                          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                          gap: 8, padding: "32px 16px",
+                          background: "#0d0d0d", border: "1px dashed #333", borderRadius: 10,
+                          cursor: uploadingCover ? "not-allowed" : "pointer",
+                          opacity: uploadingCover ? 0.6 : 1,
+                        }}>
+                          <span style={{ fontSize: 24 }}>📸</span>
+                          <span style={{ color: "#aaa", fontSize: 13, fontWeight: 500 }}>
+                            {uploadingCover ? "Uploading..." : "Click to upload image"}
+                          </span>
+                          <span style={{ color: "#555", fontSize: 11 }}>PNG, JPG up to 5MB</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingCover}
+                            onChange={e => {
+                              const f = e.target.files?.[0];
+                              if (f) uploadCoverImage(f);
+                            }}
+                            style={{ display: "none" }}
+                          />
+                        </label>
+                      )}
                       <p style={{ color: "#444", fontSize: 11, marginTop: 4 }}>Landscape image recommended (1200x600+).</p>
                     </div>
                   </div>
