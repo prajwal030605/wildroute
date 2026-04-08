@@ -546,6 +546,34 @@ function IncompleteOnboardings() {
   const [error, setError] = useState("");
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState<Set<string>>(new Set());
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function deleteAgency(agency: Record<string, unknown>) {
+    const agencyId = String(agency.id);
+    const agencyName = String(agency.name || agency.email || "this agency");
+    if (!confirm(`Delete ${agencyName}? This cannot be undone.`)) return;
+
+    setDeletingId(agencyId);
+    setError("");
+    try {
+      // Delete related treks first (in case FK isn't ON DELETE CASCADE)
+      await supabase.from("agency_treks").delete().eq("agency_id", agencyId);
+      const { error: delErr } = await supabase
+        .from("agencies_directory")
+        .delete()
+        .eq("id", agencyId);
+      if (delErr) {
+        setError("Delete failed: " + delErr.message);
+        return;
+      }
+      setList(prev => prev.filter(a => String(a.id) !== agencyId));
+      setSuccess(`${agencyName} deleted.`);
+    } catch (e) {
+      setError("Delete failed: " + (e instanceof Error ? e.message : "Unknown error"));
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   async function sendReminder(agency: Record<string, unknown>) {
     const agencyEmail = String(agency.email);
@@ -934,6 +962,19 @@ function IncompleteOnboardings() {
                     padding: "8px 12px", fontSize: 11, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap",
                   }}>
                     Complete →
+                  </button>
+                  <button
+                    onClick={() => deleteAgency(agency)}
+                    disabled={deletingId === String(agency.id)}
+                    style={{
+                      background: "transparent", color: "#EF4444",
+                      border: "1px solid #EF4444", borderRadius: 8,
+                      padding: "8px 12px", fontSize: 11, fontWeight: 500,
+                      cursor: deletingId === String(agency.id) ? "not-allowed" : "pointer",
+                      whiteSpace: "nowrap", opacity: deletingId === String(agency.id) ? 0.6 : 1,
+                    }}
+                  >
+                    {deletingId === String(agency.id) ? "Deleting..." : "Delete"}
                   </button>
                 </div>
               </div>
