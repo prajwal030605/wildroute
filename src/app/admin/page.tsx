@@ -610,10 +610,12 @@ function IncompleteOnboardings() {
   const [trekAltitude, setTrekAltitude] = useState("");
   const [trekDuration, setTrekDuration] = useState("");
   const [trekDescription, setTrekDescription] = useState("");
-  const [trekPhotos, setTrekPhotos] = useState("");
+  const [trekPhotos, setTrekPhotos] = useState<string[]>([]);
+  const [uploadingTrekPhoto, setUploadingTrekPhoto] = useState(false);
   const [itinerary, setItinerary] = useState("");
   const [pastTrekCount, setPastTrekCount] = useState("");
-  const [pastTrekPhotos, setPastTrekPhotos] = useState("");
+  const [pastTrekPhotos, setPastTrekPhotos] = useState<string[]>([]);
+  const [uploadingPastPhoto, setUploadingPastPhoto] = useState(false);
   const [trekInclusions, setTrekInclusions] = useState("");
   const [trekExclusions, setTrekExclusions] = useState("");
   const [googleReviewsLink, setGoogleReviewsLink] = useState("");
@@ -654,6 +656,44 @@ function IncompleteOnboardings() {
     setSuccess("");
   }
 
+  async function uploadImageFile(file: File, prefix: string): Promise<string | null> {
+    if (!file.type.startsWith("image/")) { setError("Please select an image file."); return null; }
+    if (file.size > 5 * 1024 * 1024) { setError("Image must be smaller than 5MB."); return null; }
+    const ext = file.name.split(".").pop() || "jpg";
+    const safeId = String(selected?.registration_id || "admin").replace(/[^a-z0-9]/gi, "_");
+    const path = `${safeId}/${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("agency-images").upload(path, file, { upsert: true, cacheControl: "3600" });
+    if (upErr) { setError("Upload failed: " + upErr.message); return null; }
+    const { data } = supabase.storage.from("agency-images").getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  async function uploadAdminTrekPhotos(files: FileList) {
+    setError("");
+    setUploadingTrekPhoto(true);
+    try {
+      const urls: string[] = [];
+      for (const f of Array.from(files)) {
+        const url = await uploadImageFile(f, "trek");
+        if (url) urls.push(url);
+      }
+      setTrekPhotos(prev => [...prev, ...urls]);
+    } finally { setUploadingTrekPhoto(false); }
+  }
+
+  async function uploadAdminPastPhotos(files: FileList) {
+    setError("");
+    setUploadingPastPhoto(true);
+    try {
+      const urls: string[] = [];
+      for (const f of Array.from(files)) {
+        const url = await uploadImageFile(f, "past");
+        if (url) urls.push(url);
+      }
+      setPastTrekPhotos(prev => [...prev, ...urls]);
+    } finally { setUploadingPastPhoto(false); }
+  }
+
   async function savePage2() {
     setError("");
     if (!trekName.trim()) { setError("Trek name is required."); return; }
@@ -669,13 +709,13 @@ function IncompleteOnboardings() {
       registration_id: regId,
       trek_name: trekName.trim(),
       trek_slug: slugify(trekName),
-      trek_photos: trekPhotos.split("\n").map(u => u.trim()).filter(Boolean),
+      trek_photos: trekPhotos,
       trek_description: trekDescription.trim(),
       trek_area: trekArea.trim(),
       trek_altitude: trekAltitude.trim(),
       trek_duration: trekDuration.trim(),
       itinerary: itinerary.trim(),
-      past_trek_photos: pastTrekPhotos.split("\n").map(u => u.trim()).filter(Boolean),
+      past_trek_photos: pastTrekPhotos,
       past_trek_count: pastTrekCount ? parseInt(pastTrekCount, 10) : 0,
       inclusions: trekInclusions.split("\n").map(l => l.trim()).filter(Boolean),
       exclusions: trekExclusions.split("\n").map(l => l.trim()).filter(Boolean),
@@ -781,8 +821,26 @@ function IncompleteOnboardings() {
               </Field>
             </FormSection>
             <FormSection title="Photos & Itinerary">
-              <Field label="Trek photo URLs (one per line)">
-                <textarea value={trekPhotos} onChange={e => setTrekPhotos(e.target.value)} rows={3} placeholder="One URL per line" style={{ ...inputStyle, resize: "vertical" }} />
+              <Field label="Trek photos">
+                <>
+                  {trekPhotos.length > 0 && (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: 8, marginBottom: 10 }}>
+                      {trekPhotos.map((url, i) => (
+                        <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden", border: "1px solid #222", aspectRatio: "1/1" }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt={`Trek ${i+1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                          <button type="button" onClick={() => setTrekPhotos(prev => prev.filter((_,idx) => idx !== i))} style={{ position: "absolute", top: 4, right: 4, background: "rgba(0,0,0,0.75)", color: "#fff", border: "1px solid #333", borderRadius: 4, padding: "3px 7px", fontSize: 10, cursor: "pointer" }}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, padding: "18px 14px", background: "#0d0d0d", border: "1px dashed #333", borderRadius: 10, cursor: uploadingTrekPhoto ? "not-allowed" : "pointer", opacity: uploadingTrekPhoto ? 0.6 : 1 }}>
+                    <span style={{ fontSize: 18 }}>📸</span>
+                    <span style={{ color: "#aaa", fontSize: 12, fontWeight: 500 }}>{uploadingTrekPhoto ? "Uploading..." : "Click to upload trek photos"}</span>
+                    <span style={{ color: "#555", fontSize: 10 }}>Multiple files · PNG, JPG up to 5MB each</span>
+                    <input type="file" accept="image/*" multiple disabled={uploadingTrekPhoto} onChange={e => { if (e.target.files && e.target.files.length > 0) uploadAdminTrekPhotos(e.target.files); e.target.value = ""; }} style={{ display: "none" }} />
+                  </label>
+                </>
               </Field>
               <Field label="Day-wise itinerary" required>
                 <textarea value={itinerary} onChange={e => setItinerary(e.target.value)} rows={6} placeholder="Day 1: ...\nDay 2: ..." style={{ ...inputStyle, resize: "vertical", lineHeight: 1.8 }} />
@@ -793,8 +851,25 @@ function IncompleteOnboardings() {
                 <Field label="Past trek completions"><input value={pastTrekCount} onChange={e => setPastTrekCount(e.target.value)} type="number" placeholder="e.g. 45" style={inputStyle} /></Field>
                 <Field label="Google Reviews link"><input value={googleReviewsLink} onChange={e => setGoogleReviewsLink(e.target.value)} placeholder="https://maps.google.com/..." style={inputStyle} /></Field>
               </div>
-              <Field label="Past trek photo URLs (one per line)">
-                <textarea value={pastTrekPhotos} onChange={e => setPastTrekPhotos(e.target.value)} rows={2} placeholder="URLs" style={{ ...inputStyle, resize: "vertical" }} />
+              <Field label="Past trek photos">
+                <>
+                  {pastTrekPhotos.length > 0 && (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: 6, marginBottom: 8 }}>
+                      {pastTrekPhotos.map((url, i) => (
+                        <div key={i} style={{ position: "relative", borderRadius: 6, overflow: "hidden", border: "1px solid #222", aspectRatio: "1/1" }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt={`Past ${i+1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                          <button type="button" onClick={() => setPastTrekPhotos(prev => prev.filter((_,idx) => idx !== i))} style={{ position: "absolute", top: 2, right: 2, background: "rgba(0,0,0,0.75)", color: "#fff", border: "1px solid #333", borderRadius: 4, padding: "2px 5px", fontSize: 9, cursor: "pointer" }}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "14px 12px", background: "#0d0d0d", border: "1px dashed #333", borderRadius: 10, cursor: uploadingPastPhoto ? "not-allowed" : "pointer", opacity: uploadingPastPhoto ? 0.6 : 1 }}>
+                    <span style={{ fontSize: 16 }}>📸</span>
+                    <span style={{ color: "#aaa", fontSize: 12, fontWeight: 500 }}>{uploadingPastPhoto ? "Uploading..." : "Upload past trek photos"}</span>
+                    <input type="file" accept="image/*" multiple disabled={uploadingPastPhoto} onChange={e => { if (e.target.files && e.target.files.length > 0) uploadAdminPastPhotos(e.target.files); e.target.value = ""; }} style={{ display: "none" }} />
+                  </label>
+                </>
               </Field>
             </FormSection>
             <FormSection title="Inclusions / Exclusions">
