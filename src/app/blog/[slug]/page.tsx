@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { blogPosts } from "@/data/blogs";
@@ -159,7 +160,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {/* Hero */}
         <div style={{ position: "relative", height: 420, overflow: "hidden" }}>
-          <img src={post.coverImage} alt={post.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <Image src={post.coverImage} alt={post.title} fill sizes="100vw" style={{ objectFit: "cover" }} priority />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(10,10,10,0.95) 100%)" }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "0 24px 48px", maxWidth: 820, margin: "0 auto" }}>
             <div style={{ maxWidth: 820, margin: "0 auto" }}>
@@ -196,9 +197,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               border: "1px solid #1D9E75", borderRadius: 16,
               padding: "32px", marginTop: 48, textAlign: "center",
             }}>
-              <h3 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 10px" }}>
+              <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 700, margin: "0 0 10px" }}>
                 Ready to book your next adventure?
-              </h3>
+              </h2>
               <p style={{ color: "#888", fontSize: 15, margin: "0 0 24px" }}>
                 WildRoute verifies every agency before they go live — so you book with confidence.
               </p>
@@ -240,7 +241,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 {related.map((r) => (
                   <Link key={r.slug} href={`/blog/${r.slug}`} style={{ textDecoration: "none" }}>
                     <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                      <img src={r.coverImage} alt={r.title} style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 8, flexShrink: 0 }} />
+                      <Image src={r.coverImage} alt={r.title} width={64} height={64} style={{ objectFit: "cover", borderRadius: 8, flexShrink: 0 }} />
                       <div>
                         <p style={{ color: "#ddd", fontSize: 13, fontWeight: 600, margin: "0 0 4px", lineHeight: 1.4 }}>{r.title}</p>
                         <p style={{ color: "#555", fontSize: 12, margin: 0 }}>{r.readTime}</p>
