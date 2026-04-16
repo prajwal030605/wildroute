@@ -6,6 +6,7 @@ import TrekCard from "@/components/ui/TrekCard";
 import EnquiryForm from "@/components/ui/EnquiryForm";
 import { agencies } from "@/data/agencies";
 import { treks } from "@/data/treks";
+import type { Metadata } from "next";
 
 const activityEmoji: Record<string, string> = {
   trekking: "🥾", rafting: "🚣", paragliding: "🪂", bungee: "🪢",
@@ -14,6 +15,43 @@ const activityEmoji: Record<string, string> = {
 
 export function generateStaticParams() {
   return agencies.map((a) => ({ slug: a.slug }));
+}
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const agency = agencies.find((a) => a.slug === slug);
+  if (!agency) return {};
+
+  const agencyTreks = treks.filter((t) => t.agencyId === agency.id);
+  const title = `${agency.name} — Verified Adventure Agency in ${agency.location}`;
+  const description = `${agency.description.slice(0, 155)}…`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      agency.name,
+      `adventure agency ${agency.state}`,
+      `trekking agency ${agency.location}`,
+      ...agency.activities.map((a) => `${a} ${agency.state}`),
+    ],
+    openGraph: {
+      title: `${agency.name} | WildRoute`,
+      description,
+      url: `https://wildroute.in/agency/${agency.slug}`,
+      images: agency.coverImage
+        ? [{ url: agency.coverImage, width: 1200, height: 630, alt: agency.name }]
+        : [{ url: "/og-image.png", width: 1200, height: 630, alt: agency.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${agency.name} | WildRoute`,
+      description: `${agency.name} offers ${agencyTreks.length} adventures in ${agency.state}. ${agency.verified ? "Verified agency." : ""}`,
+      images: agency.coverImage ? [agency.coverImage] : ["/og-image.png"],
+    },
+  };
 }
 
 export default async function AgencyPage({ params }: { params: Promise<{ slug: string }> }) {

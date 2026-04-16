@@ -4,9 +4,39 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { blogPosts } from "@/data/blogs";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 export async function generateStaticParams() {
   return blogPosts.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const post = blogPosts.find((p) => p.slug === slug);
+  if (!post) return {};
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    keywords: [post.category, "trekking India", "adventure travel", "WildRoute blog"],
+    openGraph: {
+      title: `${post.title} | WildRoute Blog`,
+      description: post.excerpt,
+      url: `https://wildroute.in/blog/${post.slug}`,
+      type: "article",
+      images: post.coverImage
+        ? [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }]
+        : [{ url: "/og-image.png", width: 1200, height: 630, alt: post.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${post.title} | WildRoute Blog`,
+      description: post.excerpt,
+      images: post.coverImage ? [post.coverImage] : ["/og-image.png"],
+    },
+  };
 }
 
 const categoryColors: Record<string, { bg: string; color: string }> = {

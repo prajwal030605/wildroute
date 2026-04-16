@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import { treks } from "@/data/treks";
 import { agencies } from "@/data/agencies";
 import EnquiryForm from "@/components/ui/EnquiryForm";
+import type { Metadata } from "next";
 
 const difficultyColor: Record<string, string> = {
   easy: "#1D9E75", moderate: "#F59E0B", hard: "#EF4444", extreme: "#7C3AED",
@@ -16,6 +17,44 @@ const activityEmoji: Record<string, string> = {
 
 export function generateStaticParams() {
   return treks.map((t) => ({ slug: t.slug }));
+}
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const trek = treks.find((t) => t.slug === slug);
+  if (!trek) return {};
+
+  const agency = agencies.find((a) => a.id === trek.agencyId);
+  const title = `${trek.title} — ${trek.duration} Trek in ${trek.state}`;
+  const description = `${trek.description.slice(0, 155)}…`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      trek.title,
+      `${trek.activityType} ${trek.state}`,
+      `trek ${trek.destination}`,
+      `${trek.difficulty} trek India`,
+      agency?.name ?? "",
+    ].filter(Boolean),
+    openGraph: {
+      title: `${trek.title} | WildRoute`,
+      description,
+      url: `https://wildroute.in/trek/${trek.slug}`,
+      images: trek.images[0]
+        ? [{ url: trek.images[0], width: 1200, height: 630, alt: trek.title }]
+        : [{ url: "/og-image.png", width: 1200, height: 630, alt: trek.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${trek.title} | WildRoute`,
+      description,
+      images: trek.images[0] ? [trek.images[0]] : ["/og-image.png"],
+    },
+  };
 }
 
 export default async function TrekPage({ params }: { params: Promise<{ slug: string }> }) {
