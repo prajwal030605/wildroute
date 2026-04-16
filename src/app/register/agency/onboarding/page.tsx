@@ -132,6 +132,36 @@ export default function AgencyOnboardingPage() {
         setEmail(user.email);
         if (!getSession()) setSession({ role: "agency", email: user.email });
       }
+
+      // Check if agency already completed onboarding — if so, skip to Step 2
+      const emailToCheck = session?.email || user?.email;
+      if (emailToCheck) {
+        const { data: agencyData } = await supabase
+          .from("agencies_directory")
+          .select("*")
+          .eq("email", emailToCheck.trim().toLowerCase())
+          .eq("onboarding_complete", true)
+          .maybeSingle();
+
+        if (agencyData) {
+          // Pre-fill agency fields from existing record
+          setName(agencyData.name || "");
+          setLocation(agencyData.location || "");
+          setState(agencyData.state || "");
+          setAddress(agencyData.address || "");
+          setDescription(agencyData.description || "");
+          setActivities(agencyData.activities || []);
+          setEmail(agencyData.email || emailToCheck);
+          setPhone(agencyData.phone || "");
+          setWebsite(agencyData.website || "");
+          setFoundedYear(agencyData.founded_year?.toString() || "");
+          setCoverImage(agencyData.cover_image || "");
+          setPanNo(agencyData.pan_no || "");
+          setGstNo(agencyData.gst_no || "");
+          // Jump directly to trek details step
+          setStep(2);
+        }
+      }
     }
     loadSupabaseUser();
 
@@ -284,6 +314,18 @@ export default function AgencyOnboardingPage() {
         .update({ onboarding_step: 3, onboarding_complete: true })
         .eq("email", trimmedEmail);
 
+      // Send registration confirmation email
+      await fetch("/api/send-registration-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: trimmedEmail,
+          agencyName: name,
+          registrationId,
+          trekName: trekName.trim() || null,
+        }),
+      });
+
       setSuccess(true);
     } finally {
       setLoading(false);
@@ -339,8 +381,26 @@ export default function AgencyOnboardingPage() {
           <p style={{ color: "#555", fontSize: 13, marginBottom: 32 }}>
             Registration ID: <strong style={{ color: "#1D9E75" }}>{registrationId}</strong> — Our team will review and verify your listing within 24-48 hours.
           </p>
-          <div style={{ display: "flex", gap: 12 }}>
-            <button type="button" onClick={() => router.push("/")} style={{ background: "#1D9E75", color: "#fff", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer" }}>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+            <button type="button" onClick={() => {
+              // Reset only trek & pricing fields, keep agency data, go to Step 2
+              setTrekName(""); setTrekPhotos(""); setTrekDescription("");
+              setTrekArea(""); setTrekAltitude(""); setTrekDuration("");
+              setItinerary(""); setPastTrekPhotos(""); setPastTrekCount("");
+              setTrekInclusions(""); setTrekExclusions(""); setGoogleReviewsLink("");
+              setPricePerPerson(""); setDiscountPercent(""); setDiscountNote("");
+              setIncludesStay(false); setStayType(""); setIncludesFood(false);
+              setFoodType(""); setIncludesGuide(false); setIncludesPermits(false);
+              setExcludesTransport(true); setExcludesPersonal(true);
+              setDifficulty(""); setBatchDates(""); setSeason([]);
+              setRegistrationId(generateRegistrationId());
+              setError("");
+              setSuccess(false);
+              setStep(2);
+            }} style={{ background: "#1D9E75", color: "#fff", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer" }}>
+              + Add Another Trek
+            </button>
+            <button type="button" onClick={() => router.push("/")} style={{ background: "transparent", color: "#ccc", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "1px solid #444", cursor: "pointer" }}>
               Go to homepage
             </button>
             <button type="button" onClick={() => router.push("/explore")} style={{ background: "transparent", color: "#888", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "1px solid #333", cursor: "pointer" }}>
