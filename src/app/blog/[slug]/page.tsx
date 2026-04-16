@@ -24,7 +24,7 @@ export async function generateMetadata(
     openGraph: {
       title: `${post.title} | WildRoute Blog`,
       description: post.excerpt,
-      url: `https://wildroute.in/blog/${post.slug}`,
+      url: `https://wildroute.com/blog/${post.slug}`,
       type: "article",
       images: post.coverImage
         ? [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }]
@@ -35,6 +35,9 @@ export async function generateMetadata(
       title: `${post.title} | WildRoute Blog`,
       description: post.excerpt,
       images: post.coverImage ? [post.coverImage] : ["/og-image.png"],
+    },
+    alternates: {
+      canonical: `https://wildroute.com/blog/${post.slug}`,
     },
   };
 }

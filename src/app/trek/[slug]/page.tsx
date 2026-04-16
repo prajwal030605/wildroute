@@ -43,7 +43,7 @@ export async function generateMetadata(
     openGraph: {
       title: `${trek.title} | WildRoute`,
       description,
-      url: `https://wildroute.in/trek/${trek.slug}`,
+      url: `https://wildroute.com/trek/${trek.slug}`,
       images: trek.images[0]
         ? [{ url: trek.images[0], width: 1200, height: 630, alt: trek.title }]
         : [{ url: "/og-image.png", width: 1200, height: 630, alt: trek.title }],
@@ -53,6 +53,9 @@ export async function generateMetadata(
       title: `${trek.title} | WildRoute`,
       description,
       images: trek.images[0] ? [trek.images[0]] : ["/og-image.png"],
+    },
+    alternates: {
+      canonical: `https://wildroute.com/trek/${trek.slug}`,
     },
   };
 }

@@ -454,7 +454,7 @@ export default function AgencyOnboardingPage() {
                     <div>
                       <label style={labelStyle}>Agency Name *</label>
                       <input type="text" placeholder="e.g. Himalayan Trails" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
-                      {name && <p style={{ color: "#444", fontSize: 11, marginTop: 4 }}>URL: wildroute.in/agency/{generateSlug(name)}</p>}
+                      {name && <p style={{ color: "#444", fontSize: 11, marginTop: 4 }}>URL: wildroute.com/agency/{generateSlug(name)}</p>}
                     </div>
                     <div>
                       <label style={labelStyle}>About your agency *</label>

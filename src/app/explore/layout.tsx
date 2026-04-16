@@ -16,13 +16,16 @@ export const metadata: Metadata = {
     title: "Explore Adventures | WildRoute",
     description:
       "Browse verified treks, camping, rafting, paragliding and adventure activities across India.",
-    url: "https://wildroute.in/explore",
+    url: "https://wildroute.com/explore",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Explore Adventures on WildRoute" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Explore Adventures | WildRoute",
     description: "Browse verified treks, camping, rafting, and more across India.",
+  },
+  alternates: {
+    canonical: "https://wildroute.com/explore",
   },
 };
 

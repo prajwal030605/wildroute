@@ -40,7 +40,7 @@ export async function generateMetadata(
     openGraph: {
       title: `${agency.name} | WildRoute`,
       description,
-      url: `https://wildroute.in/agency/${agency.slug}`,
+      url: `https://wildroute.com/agency/${agency.slug}`,
       images: agency.coverImage
         ? [{ url: agency.coverImage, width: 1200, height: 630, alt: agency.name }]
         : [{ url: "/og-image.png", width: 1200, height: 630, alt: agency.name }],
@@ -50,6 +50,9 @@ export async function generateMetadata(
       title: `${agency.name} | WildRoute`,
       description: `${agency.name} offers ${agencyTreks.length} adventures in ${agency.state}. ${agency.verified ? "Verified agency." : ""}`,
       images: agency.coverImage ? [agency.coverImage] : ["/og-image.png"],
+    },
+    alternates: {
+      canonical: `https://wildroute.com/agency/${agency.slug}`,
     },
   };
 }

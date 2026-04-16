@@ -32,13 +32,13 @@ export const metadata: Metadata = {
     "adventure agencies India",
     "WildRoute",
   ],
-  authors: [{ name: "WildRoute", url: "https://wildroute.in" }],
+  authors: [{ name: "WildRoute", url: "https://wildroute.com" }],
   creator: "WildRoute",
-  metadataBase: new URL("https://wildroute.in"),
+  metadataBase: new URL("https://wildroute.com"),
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://wildroute.in",
+    url: "https://wildroute.com",
     siteName: "WildRoute",
     title: "WildRoute — Your Route to Real Adventure",
     description:
@@ -59,6 +59,9 @@ export const metadata: Metadata = {
       "Discover and book verified treks, camping, rafting, and adventure experiences across India.",
     images: ["/og-image.png"],
     creator: "@wildroute_in",
+  },
+  alternates: {
+    canonical: "https://wildroute.com",
   },
   robots: {
     index: true,
