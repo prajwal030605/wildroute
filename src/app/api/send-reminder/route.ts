@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: "WildRoute <onboarding@wildroute.in>",
+      from: "WildRoute <onboarding@wildroute.com>",
       to: [email],
       subject: `Complete your WildRoute registration — ${registrationId || ""}`,
       html: `
@@ -50,20 +50,20 @@ export async function POST(req: NextRequest) {
           ${registrationId ? `<p style="color: #555; font-size: 12px;">Registration ID: <strong style="color: #888;">${registrationId}</strong></p>` : ""}
 
           <div style="text-align: center; margin: 32px 0;">
-            <a href="https://wildroute.in/register/agency/onboarding" style="background: #1D9E75; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+            <a href="https://wildroute.com/register/agency/onboarding" style="background: #1D9E75; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
               Complete Registration →
             </a>
           </div>
 
           <p style="color: #555; font-size: 13px; line-height: 1.7;">
-            If you need help, just reply to this email or contact us at <a href="mailto:support@wildroute.in" style="color: #1D9E75;">support@wildroute.in</a>.
+            If you need help, just reply to this email or contact us at <a href="mailto:support@wildroute.com" style="color: #1D9E75;">support@wildroute.com</a>.
           </p>
 
           <hr style="border: none; border-top: 1px solid #1a1a1a; margin: 28px 0;" />
 
           <p style="color: #333; font-size: 11px; text-align: center;">
             WildRoute — India's Adventure Platform<br />
-            You're receiving this because you started registering on wildroute.in
+            You're receiving this because you started registering on wildroute.com
           </p>
         </div>
       `,
