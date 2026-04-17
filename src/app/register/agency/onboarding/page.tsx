@@ -89,21 +89,18 @@ export default function AgencyOnboardingPage() {
   const [website, setWebsite] = useState("");
   const [foundedYear, setFoundedYear] = useState("");
   const [coverImage, setCoverImage] = useState("");
-  const [uploadingCover, setUploadingCover] = useState(false);
   const [panNo, setPanNo] = useState("");
   const [gstNo, setGstNo] = useState("");
 
   /* ── Page 2: Trek Details ── */
   const [trekName, setTrekName] = useState("");
-  const [trekPhotos, setTrekPhotos] = useState<string[]>([]);
-  const [uploadingTrekPhoto, setUploadingTrekPhoto] = useState(false);
+  const [trekPhotos, setTrekPhotos] = useState("");
   const [trekDescription, setTrekDescription] = useState("");
   const [trekArea, setTrekArea] = useState("");
   const [trekAltitude, setTrekAltitude] = useState("");
   const [trekDuration, setTrekDuration] = useState("");
   const [itinerary, setItinerary] = useState("");
-  const [pastTrekPhotos, setPastTrekPhotos] = useState<string[]>([]);
-  const [uploadingPastPhoto, setUploadingPastPhoto] = useState(false);
+  const [pastTrekPhotos, setPastTrekPhotos] = useState("");
   const [pastTrekCount, setPastTrekCount] = useState("");
   const [trekInclusions, setTrekInclusions] = useState("");
   const [trekExclusions, setTrekExclusions] = useState("");
@@ -135,75 +132,41 @@ export default function AgencyOnboardingPage() {
         setEmail(user.email);
         if (!getSession()) setSession({ role: "agency", email: user.email });
       }
+
+      // Check if agency already completed onboarding — if so, skip to Step 2
+      const emailToCheck = session?.email || user?.email;
+      if (emailToCheck) {
+        const { data: agencyData } = await supabase
+          .from("agencies_directory")
+          .select("*")
+          .eq("email", emailToCheck.trim().toLowerCase())
+          .eq("onboarding_complete", true)
+          .maybeSingle();
+
+        if (agencyData) {
+          // Pre-fill agency fields from existing record
+          setName(agencyData.name || "");
+          setLocation(agencyData.location || "");
+          setState(agencyData.state || "");
+          setAddress(agencyData.address || "");
+          setDescription(agencyData.description || "");
+          setActivities(agencyData.activities || []);
+          setEmail(agencyData.email || emailToCheck);
+          setPhone(agencyData.phone || "");
+          setWebsite(agencyData.website || "");
+          setFoundedYear(agencyData.founded_year?.toString() || "");
+          setCoverImage(agencyData.cover_image || "");
+          setPanNo(agencyData.pan_no || "");
+          setGstNo(agencyData.gst_no || "");
+          // Jump directly to trek details step
+          setStep(2);
+        }
+      }
     }
     loadSupabaseUser();
 
     setRegistrationId(generateRegistrationId());
   }, []);
-
-  async function uploadImageFile(file: File, prefix: string): Promise<string | null> {
-    if (!file.type.startsWith("image/")) {
-      setError("Please select an image file.");
-      return null;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Image must be smaller than 5MB.");
-      return null;
-    }
-    const ext = file.name.split(".").pop() || "jpg";
-    const safeEmail = (email || "anon").replace(/[^a-z0-9]/gi, "_");
-    const path = `${safeEmail}/${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const { error: upErr } = await supabase.storage
-      .from("agency-images")
-      .upload(path, file, { upsert: true, cacheControl: "3600" });
-    if (upErr) {
-      setError("Upload failed: " + upErr.message);
-      return null;
-    }
-    const { data } = supabase.storage.from("agency-images").getPublicUrl(path);
-    return data.publicUrl;
-  }
-
-  async function uploadCoverImage(file: File) {
-    setError("");
-    setUploadingCover(true);
-    try {
-      const url = await uploadImageFile(file, "cover");
-      if (url) setCoverImage(url);
-    } finally {
-      setUploadingCover(false);
-    }
-  }
-
-  async function uploadTrekPhotos(files: FileList) {
-    setError("");
-    setUploadingTrekPhoto(true);
-    try {
-      const urls: string[] = [];
-      for (const f of Array.from(files)) {
-        const url = await uploadImageFile(f, "trek");
-        if (url) urls.push(url);
-      }
-      setTrekPhotos(prev => [...prev, ...urls]);
-    } finally {
-      setUploadingTrekPhoto(false);
-    }
-  }
-
-  async function uploadPastTrekPhotos(files: FileList) {
-    setError("");
-    setUploadingPastPhoto(true);
-    try {
-      const urls: string[] = [];
-      for (const f of Array.from(files)) {
-        const url = await uploadImageFile(f, "past");
-        if (url) urls.push(url);
-      }
-      setPastTrekPhotos(prev => [...prev, ...urls]);
-    } finally {
-      setUploadingPastPhoto(false);
-    }
-  }
 
   function toggleActivity(activity: ActivityType) {
     setActivities(prev =>
@@ -286,13 +249,13 @@ export default function AgencyOnboardingPage() {
         registration_id: registrationId,
         trek_name: trekName.trim(),
         trek_slug: trekSlug,
-        trek_photos: trekPhotos,
+        trek_photos: trekPhotos.split("\n").map(u => u.trim()).filter(Boolean),
         trek_description: trekDescription.trim(),
         trek_area: trekArea.trim(),
         trek_altitude: trekAltitude.trim(),
         trek_duration: trekDuration.trim(),
         itinerary: itinerary.trim(),
-        past_trek_photos: pastTrekPhotos,
+        past_trek_photos: pastTrekPhotos.split("\n").map(u => u.trim()).filter(Boolean),
         past_trek_count: pastTrekCount ? parseInt(pastTrekCount, 10) : 0,
         inclusions: trekInclusions.split("\n").map(l => l.trim()).filter(Boolean),
         exclusions: trekExclusions.split("\n").map(l => l.trim()).filter(Boolean),
@@ -351,6 +314,18 @@ export default function AgencyOnboardingPage() {
         .update({ onboarding_step: 3, onboarding_complete: true })
         .eq("email", trimmedEmail);
 
+      // Send registration confirmation email
+      await fetch("/api/send-registration-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: trimmedEmail,
+          agencyName: name,
+          registrationId,
+          trekName: trekName.trim() || null,
+        }),
+      });
+
       setSuccess(true);
     } finally {
       setLoading(false);
@@ -406,8 +381,26 @@ export default function AgencyOnboardingPage() {
           <p style={{ color: "#555", fontSize: 13, marginBottom: 32 }}>
             Registration ID: <strong style={{ color: "#1D9E75" }}>{registrationId}</strong> — Our team will review and verify your listing within 24-48 hours.
           </p>
-          <div style={{ display: "flex", gap: 12 }}>
-            <button type="button" onClick={() => router.push("/")} style={{ background: "#1D9E75", color: "#fff", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer" }}>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+            <button type="button" onClick={() => {
+              // Reset only trek & pricing fields, keep agency data, go to Step 2
+              setTrekName(""); setTrekPhotos(""); setTrekDescription("");
+              setTrekArea(""); setTrekAltitude(""); setTrekDuration("");
+              setItinerary(""); setPastTrekPhotos(""); setPastTrekCount("");
+              setTrekInclusions(""); setTrekExclusions(""); setGoogleReviewsLink("");
+              setPricePerPerson(""); setDiscountPercent(""); setDiscountNote("");
+              setIncludesStay(false); setStayType(""); setIncludesFood(false);
+              setFoodType(""); setIncludesGuide(false); setIncludesPermits(false);
+              setExcludesTransport(true); setExcludesPersonal(true);
+              setDifficulty(""); setBatchDates(""); setSeason([]);
+              setRegistrationId(generateRegistrationId());
+              setError("");
+              setSuccess(false);
+              setStep(2);
+            }} style={{ background: "#1D9E75", color: "#fff", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer" }}>
+              + Add Another Trek
+            </button>
+            <button type="button" onClick={() => router.push("/")} style={{ background: "transparent", color: "#ccc", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "1px solid #444", cursor: "pointer" }}>
               Go to homepage
             </button>
             <button type="button" onClick={() => router.push("/explore")} style={{ background: "transparent", color: "#888", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "1px solid #333", cursor: "pointer" }}>
@@ -461,7 +454,7 @@ export default function AgencyOnboardingPage() {
                     <div>
                       <label style={labelStyle}>Agency Name *</label>
                       <input type="text" placeholder="e.g. Himalayan Trails" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
-                      {name && <p style={{ color: "#444", fontSize: 11, marginTop: 4 }}>URL: wildroute.in/agency/{generateSlug(name)}</p>}
+                      {name && <p style={{ color: "#444", fontSize: 11, marginTop: 4 }}>URL: wildroute.com/agency/{generateSlug(name)}</p>}
                     </div>
                     <div>
                       <label style={labelStyle}>About your agency *</label>
@@ -553,53 +546,8 @@ export default function AgencyOnboardingPage() {
                       </div>
                     </div>
                     <div>
-                      <label style={labelStyle}>Cover Image</label>
-                      {coverImage ? (
-                        <div style={{
-                          position: "relative", borderRadius: 10, overflow: "hidden",
-                          border: "1px solid #222", marginBottom: 8,
-                        }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={coverImage} alt="Cover preview" style={{
-                            width: "100%", height: 180, objectFit: "cover", display: "block",
-                          }} />
-                          <button
-                            type="button"
-                            onClick={() => setCoverImage("")}
-                            style={{
-                              position: "absolute", top: 8, right: 8,
-                              background: "rgba(0,0,0,0.7)", color: "#fff", border: "1px solid #333",
-                              borderRadius: 6, padding: "6px 12px", fontSize: 11, cursor: "pointer",
-                            }}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ) : (
-                        <label style={{
-                          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                          gap: 8, padding: "32px 16px",
-                          background: "#0d0d0d", border: "1px dashed #333", borderRadius: 10,
-                          cursor: uploadingCover ? "not-allowed" : "pointer",
-                          opacity: uploadingCover ? 0.6 : 1,
-                        }}>
-                          <span style={{ fontSize: 24 }}>📸</span>
-                          <span style={{ color: "#aaa", fontSize: 13, fontWeight: 500 }}>
-                            {uploadingCover ? "Uploading..." : "Click to upload image"}
-                          </span>
-                          <span style={{ color: "#555", fontSize: 11 }}>PNG, JPG up to 5MB</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            disabled={uploadingCover}
-                            onChange={e => {
-                              const f = e.target.files?.[0];
-                              if (f) uploadCoverImage(f);
-                            }}
-                            style={{ display: "none" }}
-                          />
-                        </label>
-                      )}
+                      <label style={labelStyle}>Cover Image URL</label>
+                      <input type="url" placeholder="https://images.unsplash.com/..." value={coverImage} onChange={e => setCoverImage(e.target.value)} style={inputStyle} />
                       <p style={{ color: "#444", fontSize: 11, marginTop: 4 }}>Landscape image recommended (1200x600+).</p>
                     </div>
                   </div>
@@ -651,52 +599,9 @@ export default function AgencyOnboardingPage() {
 
                 {sectionTitle("PHOTOGRAPHS")}
                 <div>
-                  <label style={labelStyle}>Trek Photos</label>
-                  {trekPhotos.length > 0 && (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 8, marginBottom: 10 }}>
-                      {trekPhotos.map((url, i) => (
-                        <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden", border: "1px solid #222", aspectRatio: "1 / 1" }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt={`Trek ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                          <button
-                            type="button"
-                            onClick={() => setTrekPhotos(prev => prev.filter((_, idx) => idx !== i))}
-                            style={{
-                              position: "absolute", top: 4, right: 4,
-                              background: "rgba(0,0,0,0.75)", color: "#fff", border: "1px solid #333",
-                              borderRadius: 4, padding: "3px 7px", fontSize: 10, cursor: "pointer",
-                            }}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <label style={{
-                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                    gap: 6, padding: "20px 16px",
-                    background: "#0d0d0d", border: "1px dashed #333", borderRadius: 10,
-                    cursor: uploadingTrekPhoto ? "not-allowed" : "pointer",
-                    opacity: uploadingTrekPhoto ? 0.6 : 1,
-                  }}>
-                    <span style={{ fontSize: 20 }}>📸</span>
-                    <span style={{ color: "#aaa", fontSize: 12, fontWeight: 500 }}>
-                      {uploadingTrekPhoto ? "Uploading..." : "Click to upload trek photos"}
-                    </span>
-                    <span style={{ color: "#555", fontSize: 10 }}>Multiple files allowed · PNG, JPG up to 5MB each</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      disabled={uploadingTrekPhoto}
-                      onChange={e => {
-                        if (e.target.files && e.target.files.length > 0) uploadTrekPhotos(e.target.files);
-                        e.target.value = "";
-                      }}
-                      style={{ display: "none" }}
-                    />
-                  </label>
+                  <label style={labelStyle}>Trek Photo URLs (one per line)</label>
+                  <textarea placeholder={"https://images.unsplash.com/photo-1.jpg\nhttps://images.unsplash.com/photo-2.jpg"} value={trekPhotos} onChange={e => setTrekPhotos(e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" as const }} />
+                  <p style={{ color: "#444", fontSize: 11, marginTop: 4 }}>Add image URLs showcasing this trek. One URL per line.</p>
                 </div>
 
                 {sectionTitle("ITINERARY")}
@@ -718,51 +623,8 @@ export default function AgencyOnboardingPage() {
                     <input type="number" placeholder="e.g. 45" value={pastTrekCount} onChange={e => setPastTrekCount(e.target.value)} style={inputStyle} />
                   </div>
                   <div>
-                    <label style={labelStyle}>Past trek photos</label>
-                    {pastTrekPhotos.length > 0 && (
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: 6, marginBottom: 8 }}>
-                        {pastTrekPhotos.map((url, i) => (
-                          <div key={i} style={{ position: "relative", borderRadius: 6, overflow: "hidden", border: "1px solid #222", aspectRatio: "1 / 1" }}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={url} alt={`Past ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                            <button
-                              type="button"
-                              onClick={() => setPastTrekPhotos(prev => prev.filter((_, idx) => idx !== i))}
-                              style={{
-                                position: "absolute", top: 2, right: 2,
-                                background: "rgba(0,0,0,0.75)", color: "#fff", border: "1px solid #333",
-                                borderRadius: 4, padding: "2px 5px", fontSize: 9, cursor: "pointer",
-                              }}
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <label style={{
-                      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                      padding: "14px 12px",
-                      background: "#0d0d0d", border: "1px dashed #333", borderRadius: 10,
-                      cursor: uploadingPastPhoto ? "not-allowed" : "pointer",
-                      opacity: uploadingPastPhoto ? 0.6 : 1,
-                    }}>
-                      <span style={{ fontSize: 16 }}>📸</span>
-                      <span style={{ color: "#aaa", fontSize: 12, fontWeight: 500 }}>
-                        {uploadingPastPhoto ? "Uploading..." : "Upload past trek photos"}
-                      </span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        disabled={uploadingPastPhoto}
-                        onChange={e => {
-                          if (e.target.files && e.target.files.length > 0) uploadPastTrekPhotos(e.target.files);
-                          e.target.value = "";
-                        }}
-                        style={{ display: "none" }}
-                      />
-                    </label>
+                    <label style={labelStyle}>Past trek photo URLs (one per line)</label>
+                    <textarea placeholder="URLs of photos from past batches" value={pastTrekPhotos} onChange={e => setPastTrekPhotos(e.target.value)} rows={2} style={{ ...inputStyle, resize: "vertical" as const }} />
                   </div>
                 </div>
 

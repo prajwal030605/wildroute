@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { blogPosts } from "@/data/blogs";
@@ -55,10 +56,13 @@ export default function BlogPage() {
                 onMouseLeave={e => (e.currentTarget.style.borderColor = "#1e1e1e")}
               >
                 <div style={{ position: "relative", minHeight: 340 }}>
-                  <img
+                  <Image
                     src={featured.coverImage}
                     alt={featured.title}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    style={{ objectFit: "cover" }}
+                    priority
                   />
                   <div style={{
                     position: "absolute", inset: 0,
@@ -105,11 +109,13 @@ export default function BlogPage() {
                     onMouseEnter={e => { e.currentTarget.style.borderColor = "#1D9E75"; e.currentTarget.style.transform = "translateY(-3px)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "#1e1e1e"; e.currentTarget.style.transform = "translateY(0)"; }}
                   >
-                    <div style={{ height: 200, overflow: "hidden" }}>
-                      <img
+                    <div style={{ height: 200, overflow: "hidden", position: "relative" }}>
+                      <Image
                         src={post.coverImage}
                         alt={post.title}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        style={{ objectFit: "cover" }}
                       />
                     </div>
                     <div style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column" }}>

@@ -280,7 +280,7 @@ export default function AgencyAuthPage() {
           <p style={{ color: "#333", fontSize: 11, textAlign: "center", marginTop: 16 }}>
             {mode === "signup"
               ? "By signing up, you agree to our terms of service."
-              : "Forgot your password? Contact support@wildroute.in"}
+              : "Forgot your password? Contact support@wildroute.com"}
           </p>
         </div>
       </section>
