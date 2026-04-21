@@ -144,7 +144,7 @@ A legitimate agency will answer these questions confidently and in detail. They'
 
 At WildRoute, we verify all of the above before any agency goes live on our platform. We check registrations, guide certifications, safety equipment, and real customer reviews. So you don't have to do the legwork — we do it for you.
 
-Join the waitlist at www.wildroute.com and be the first to access verified agencies when we launch.`,
+Join the waitlist at www.gowildroute.com and be the first to access verified agencies when we launch.`,
   },
   {
     slug: "best-treks-india-beginners",
@@ -226,7 +226,7 @@ Pick based on: how fit you are right now (not how fit you plan to be), how many 
 
 Most importantly, go with a verified agency. A good guide changes everything — the experience, the safety, and the memories you take home.
 
-WildRoute is building the platform to find and compare verified agencies for all of these treks. Join the waitlist at www.wildroute.com.`,
+WildRoute is building the platform to find and compare verified agencies for all of these treks. Join the waitlist at www.gowildroute.com.`,
   },
   {
     slug: "rishikesh-rafting-complete-guide",
@@ -299,7 +299,7 @@ Many operators offer cliff jumping as an add-on (₹200–₹500). It's popular 
 
 We're building WildRoute specifically because the Rishikesh rafting space is full of operators who look the same on the surface but are very different when it comes to safety and experience. When we launch, you'll be able to compare verified Rishikesh rafting operators side by side — certifications, reviews, pricing, safety record — all in one place.
 
-Join the waitlist at www.wildroute.com.`,
+Join the waitlist at www.gowildroute.com.`,
   },
   {
     slug: "kedarkantha-trek-complete-guide-2026",
@@ -485,6 +485,6 @@ Trust your instincts. If the communication has been vague, the pricing has shift
 
 WildRoute was built because we were frustrated by exactly this problem. We manually verify every agency on our platform — GST registration, guide certifications, safety equipment, and real reviews. No agency goes live without passing our checks.
 
-Browse verified agencies at wildroute.com — and if you find any agency using these tactics, report them to your state tourism board. It might save someone else's trip. Or more.`,
+Browse verified agencies at gowildroute.com — and if you find any agency using these tactics, report them to your state tourism board. It might save someone else's trip. Or more.`,
   },
 ];

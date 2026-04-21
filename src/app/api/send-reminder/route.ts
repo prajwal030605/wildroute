@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
           ${registrationId ? `<p style="color: #555; font-size: 12px;">Registration ID: <strong style="color: #888;">${registrationId}</strong></p>` : ""}
 
           <div style="text-align: center; margin: 32px 0;">
-            <a href="https://wildroute.com/register/agency/onboarding" style="background: #1D9E75; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+            <a href="https://gowildroute.com/register/agency/onboarding" style="background: #1D9E75; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
               Complete Registration →
             </a>
           </div>
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
           <p style="color: #333; font-size: 11px; text-align: center;">
             WildRoute — India's Adventure Platform<br />
-            You're receiving this because you started registering on wildroute.com
+            You're receiving this because you started registering on gowildroute.com
           </p>
         </div>
       `,

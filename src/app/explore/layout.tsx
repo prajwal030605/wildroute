@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Explore Adventures | WildRoute",
     description:
       "Browse verified treks, camping, rafting, paragliding and adventure activities across India.",
-    url: "https://wildroute.com/explore",
+    url: "https://gowildroute.com/explore",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Explore Adventures on WildRoute" }],
   },
   twitter: {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     description: "Browse verified treks, camping, rafting, and more across India.",
   },
   alternates: {
-    canonical: "https://wildroute.com/explore",
+    canonical: "https://gowildroute.com/explore",
   },
 };
 
