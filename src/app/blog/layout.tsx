@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Blog — Trek Smarter | WildRoute",
     description:
       "Honest guides, cost breakdowns, safety tips and everything you need to plan your next Indian adventure.",
-    url: "https://wildroute.com/blog",
+    url: "https://gowildroute.com/blog",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "WildRoute Blog" }],
   },
   twitter: {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     description: "Honest trek guides, cost breakdowns and safety tips for Indian adventures.",
   },
   alternates: {
-    canonical: "https://wildroute.com/blog",
+    canonical: "https://gowildroute.com/blog",
   },
 };
 

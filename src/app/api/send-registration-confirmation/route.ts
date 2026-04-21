@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
                 <div style="min-width: 28px; height: 28px; background: #1D9E75; border-radius: 50%; text-align: center; line-height: 28px; font-size: 12px; font-weight: 700; color: #fff;">2</div>
                 <div>
                   <p style="color: #ccc; font-size: 13px; font-weight: 600; margin: 0 0 2px 0;">Go Live</p>
-                  <p style="color: #555; font-size: 12px; margin: 0;">Once verified, your agency page and treks go live on wildroute.com.</p>
+                  <p style="color: #555; font-size: 12px; margin: 0;">Once verified, your agency page and treks go live on gowildroute.com.</p>
                 </div>
               </div>
               <div style="display: flex; gap: 14px; align-items: flex-start;">
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
 
           <!-- CTA -->
           <div style="text-align: center; padding: 0 32px 36px;">
-            <a href="https://wildroute.com/explore" style="background: #1D9E75; color: #fff; padding: 14px 36px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; display: inline-block;">
+            <a href="https://gowildroute.com/explore" style="background: #1D9E75; color: #fff; padding: 14px 36px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; display: inline-block;">
               Explore WildRoute →
             </a>
             <p style="color: #444; font-size: 12px; margin: 16px 0 0 0;">
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
           <div style="background: #0d0d0d; border-top: 1px solid #1a1a1a; padding: 20px 32px; text-align: center;">
             <p style="color: #333; font-size: 11px; margin: 0; line-height: 1.6;">
               WildRoute — India's Adventure Platform<br />
-              You're receiving this because you registered your agency on <a href="https://wildroute.com" style="color: #444; text-decoration: none;">wildroute.com</a>
+              You're receiving this because you registered your agency on <a href="https://gowildroute.com" style="color: #444; text-decoration: none;">wildroute.com</a>
             </p>
           </div>
 

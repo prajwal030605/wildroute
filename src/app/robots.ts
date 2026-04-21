@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin", "/register/agency/onboarding", "/api/", "/login"],
       },
     ],
-    sitemap: "https://wildroute.com/sitemap.xml",
-    host: "https://wildroute.com",
+    sitemap: "https://gowildroute.com/sitemap.xml",
+    host: "https://gowildroute.com",
   };
 }

@@ -3,7 +3,7 @@ import { treks } from "@/data/treks";
 import { agencies } from "@/data/agencies";
 import { blogPosts } from "@/data/blogs";
 
-const BASE_URL = "https://wildroute.com";
+const BASE_URL = "https://gowildroute.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Static pages
