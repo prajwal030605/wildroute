@@ -301,4 +301,190 @@ We're building WildRoute specifically because the Rishikesh rafting space is ful
 
 Join the waitlist at www.wildroute.com.`,
   },
+  {
+    slug: "kedarkantha-trek-complete-guide-2026",
+    title: "Kedarkantha Trek: The Only Guide You'll Ever Need (2026)",
+    excerpt: "6,000+ people attempt Kedarkantha every winter season. Most are underprepared. Here's the complete, honest guide — best time, cost, fitness level, what to pack, and how to not ruin your trip.",
+    category: "Trek Guides",
+    readTime: "11 min read",
+    date: "April 20, 2026",
+    coverImage: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=80",
+    content: `Kedarkantha is the most popular winter trek in India. Every year between December and April, thousands of people summit this 12,500-ft peak in the Uttarkashi district of Uttarakhand, making it one of the most climbed mountains in the Himalayas.
+
+And honestly? The hype is completely justified.
+
+But it also means there's a lot of bad information out there — blogs that copy from each other, agencies selling the same cookie-cutter package, and first-timers showing up completely underprepared. This guide fixes all of that.
+
+![Kedarkantha summit at sunrise — one of the most photographed views in the Indian Himalayas](https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=85)
+
+## What Makes Kedarkantha Special
+
+Let's start with why people actually love this trek:
+
+**The summit view.** On a clear morning, you can see Swargarohini, Bandarpoonch, Kala Nag, Ranglana, and — on perfect days — even the distant outlines of the Gangotri range. It's a 360-degree panoramic view that most experienced trekkers rank among the best in the Himalayas.
+
+**It's achievable.** At 12,500 ft (3,810m), it's high enough to feel like a real Himalayan achievement, but not so high that acclimatisation becomes a serious issue for healthy adults. No technical climbing required.
+
+**The forest.** The trail passes through some of the most beautiful oak and pine forests in Uttarakhand. In winter, they're blanketed in snow. The campsite at Kedarkantha Base (at 11,250 ft) is one of the most surreal overnight spots you'll ever wake up at.
+
+![The oak and rhododendron forests of the Kedarkantha trail blanketed in winter snow](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=85)
+
+## When to Do Kedarkantha: An Honest Month-by-Month Breakdown
+
+This is where most guides mislead you. They say "best time is November to April" without telling you what each month actually looks like.
+
+**November:** The snow hasn't arrived yet on the lower sections. The summit area might have thin snow. Views are crystal clear because the post-monsoon air is clean. Temperature at base camp: -5°C to -10°C at night. Crowd level: low. Verdict: underrated month. Go here for solitude.
+
+**December:** First heavy snowfall usually hits mid-December. By late December the trail becomes the classic white wonderland everyone photographs. Temperature at base camp: -10°C to -18°C at night. This is the best month if you want the full white snow experience. Crowd level: medium.
+
+**January:** Peak winter. Snow everywhere. Some years the trail is so deep with snow that agencies add crampons to the mandatory gear list. Temperatures can drop to -20°C at summit area before dawn. Not for first-timers in extreme cold. Crowd level: medium-low.
+
+**February:** Similar to January but slightly warmer. School and college groups start arriving. Crowd level: medium.
+
+**March:** Snow starts melting at lower elevations but summit area still has excellent snow. Perfect balance of accessibility and snow cover. Crowd level: high (peak season). Book agencies 2–3 months in advance.
+
+**April:** Last chance for snow. The summit usually retains snow until mid-April. After that, it's a dry-trail summer trek — still beautiful, but not the iconic Kedarkantha experience most people come for. Crowd level: medium-low.
+
+## How Fit Do You Need to Be?
+
+Kedarkantha is officially classified as an "easy-moderate" trek. That classification is accurate — but "easy" in the Himalayas means something different from easy at sea level.
+
+**You're probably fine if you:** walk 5–8km regularly, can climb 4–5 floors of stairs without stopping to catch your breath, have no known cardiac or respiratory conditions.
+
+**You should prepare more if you:** sit at a desk all day and haven't exercised in months, smoke regularly, or have had issues with altitude or cold weather before.
+
+**The actual training recommendation:** 6–8 weeks of cardio before the trek. Daily walks of 5–7km. Stair climbing 3–4 times a week. Add weight to your backpack as the trek approaches. The summit day involves 4–5 hours of continuous climbing with 1,200ft of elevation gain — your legs need to be ready.
+
+![Summit day push — the final ridge walk to Kedarkantha peak is one of the most rewarding experiences of the trek](https://images.unsplash.com/photo-1622278647429-71bc97e904e8?w=1200&q=85)
+
+## The Complete Itinerary
+
+Most agencies run a 6-day itinerary. Here's what that actually looks like:
+
+**Day 0:** Travel to Dehradun. You need to reach Dehradun independently — it's 6–8 hours from Delhi by train or 7–9 hours by bus. Night stay in Dehradun.
+
+**Day 1 — Dehradun to Sankri (200 km, ~7–8 hours drive):** This is the base village for Kedarkantha. The drive takes you through Mussoorie, Nainbag, Purola, and Mori. Arrive at Sankri (6,400 ft), check into homestay.
+
+**Day 2 — Sankri to Juda Ka Talab (3.5 km, ~3 hours):** The first trekking day is an easy warm-up. You gain about 1,200 ft to reach Juda Ka Talab ("Twin Lakes") at 9,100 ft. In winter the lake is frozen and the campsite is in the middle of a dense oak forest.
+
+**Day 3 — Juda Ka Talab to Kedarkantha Base (4 km, ~4 hours):** The trail becomes steeper. You emerge from the forest into open alpine meadows. The base camp at 11,250 ft is your highest overnight stop.
+
+**Day 4 — Summit Day and descent to Hargaon (full day):** The summit push starts at 4–5 AM to hit the top at sunrise. It's 3–4 hours up, 2–3 hours down. The descent from summit continues to Hargaon camp (9,350 ft).
+
+**Day 5 — Hargaon to Sankri (6 km, ~4 hours):** Mostly downhill. Quiet, reflective trail back through the forest.
+
+**Day 6 — Sankri to Dehradun:** Drive back.
+
+## What Does Kedarkantha Cost?
+
+The price range is ₹8,500 to ₹25,000 depending on the agency and what's included.
+
+**Budget end (₹8,500–₹11,000):** Shared accommodation, basic food, group size 15–20, transport not included. These exist and some are fine — but vet carefully.
+
+**Mid-range (₹12,000–₹18,000):** Where most reputable agencies sit. Includes transport from Dehradun, accommodation, meals, experienced guide, basic camping gear. Group size 8–12.
+
+**Premium (₹20,000–₹25,000):** Smaller groups (4–8 people), IMF-certified guides, better equipment, emergency oxygen, satellite phone.
+
+**What's almost never included:** your travel to and from Dehradun, personal gear, travel insurance, tips for guides and support staff.
+
+![Traditional stone houses in Sankri village — the starting point of the Kedarkantha trek](https://images.unsplash.com/photo-1585516482738-d081d5d14785?w=1200&q=85)
+
+## What to Pack: The Non-Negotiable List
+
+**Clothing layers:** thermal base layer, fleece mid-layer, waterproof outer jacket, waterproof trekking pants, 2–3 pairs of wool socks, thermal socks, waterproof gloves, balaclava, warm beanie.
+
+**Footwear:** ankle-support waterproof trekking boots, broken in before the trek. Do not attempt in running shoes.
+
+**Other essentials:** sunscreen SPF 50+, polarised sunglasses, headlamp (mandatory for 4 AM summit start), Diamox, Ibuprofen, ORS, blister plasters.
+
+## Booking Your Trek: What WildRoute Does Differently
+
+Most people book Kedarkantha through a random Google search or a Delhi travel agent who outsources to a Sankri operator you know nothing about. WildRoute lists only verified, certified Kedarkantha operators directly — agencies whose guides are certified and whose past trekkers have reviewed them. Compare prices, read real reviews, enquire directly. No middlemen, no surprises.`,
+  },
+  {
+    slug: "signs-fake-trek-operator-india",
+    title: "13 Signs the Trekking Agency You're About to Book Is a Scam",
+    excerpt: "Every year, thousands of trekkers lose money — and some lose their lives — to fake or negligent adventure operators in India. These 13 red flags will save you.",
+    category: "Safety & Tips",
+    readTime: "7 min read",
+    date: "April 19, 2026",
+    coverImage: "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=800&q=80",
+    content: `Let me tell you about a WhatsApp conversation that cost a group of six college students ₹84,000.
+
+They found a "trekking agency" on Instagram. Beautiful reels. Thousands of followers. They paid 50% upfront — ₹14,000 per person — for what was advertised as an 8-day Har Ki Dun trek with camping, meals, certified guides, and emergency support.
+
+On Day 3, their "guide" said he had a family emergency. He never came back. They were at 11,000 ft with no map, no satellite phone, no spare food.
+
+They made it down safely. Others haven't.
+
+This happens every single trekking season. And almost every time, the warning signs were there — the trekkers just didn't know what to look for.
+
+Here are 13 of them.
+
+![Trekkers on a Himalayan ridge — when something goes wrong at altitude, the consequences are serious](https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=85)
+
+## 1. They Have No GST Number (or Won't Share It)
+
+Every legitimate business in India with revenue above ₹20 lakh is GST-registered. If an agency can't share a GST number or gets defensive when you ask — stop right there. Verifying takes 15 seconds at gst.gov.in.
+
+## 2. The Price Is Suspiciously Low
+
+If the going rate for a Kedarkantha trek is ₹11,000–₹16,000 and someone quotes ₹5,500, ask yourself: where is the money coming from? Certified guides, tents, sleeping bags, emergency oxygen, transport — all cost money. Below-market pricing means corners are being cut somewhere.
+
+## 3. They Can't Name Their Guides' Certifications
+
+Ask: "Can you tell me my guide's name and certification?" The correct answer names a certification from IMF, NIM, HIM, or a state tourism authority. "Our guides are very experienced" is not an answer.
+
+## 4. Their Google Reviews Are All 5-Star and Posted the Same Week
+
+Filter reviews by newest first. If you see 15–20 five-star reviews posted within 2 weeks of each other with generic content like "great experience! highly recommend!" — those are almost certainly bought in bulk. Real reviews have specific details: guide names, weather, what went wrong and how it was handled.
+
+![Check trail conditions and emergency protocols before booking](https://images.unsplash.com/photo-1606044491979-5a7e1d4cd5dd?w=1200&q=85)
+
+## 5. There's No Written Agreement or Receipt
+
+Any legitimate agency provides a written booking confirmation listing the trek name, dates, exact inclusions, total cost, and cancellation policy. If they ask you to pay via UPI with no written confirmation — you have no protection if anything goes wrong.
+
+## 6. They Don't Ask About Your Fitness or Medical History
+
+Legitimate agencies ask about your fitness level, respiratory or cardiac conditions, altitude experience, and medications before accepting your booking. An agency that signs you up for a 20,000-ft summit without a single health question doesn't understand what they're selling.
+
+## 7. The "Emergency Protocol" Is "Don't Worry, Nothing Will Happen"
+
+Ask every agency: "What is your emergency evacuation protocol if someone gets severe altitude sickness on Day 4?" The correct answer involves satellite communication, nearest hospital location, emergency descent plan, and whether they carry supplemental oxygen. Vague reassurance is not a protocol.
+
+## 8. They're Unregistered With State Tourism Boards
+
+Most Indian states maintain registries of certified adventure operators. Uttarakhand has UTDB, Himachal has HPTDC. Ask if they're registered. Then check. It takes 5 minutes and eliminates a huge category of risk.
+
+![High altitude camping — you're trusting your safety to your equipment and your guide](https://images.unsplash.com/photo-1622278647429-71bc97e904e8?w=1200&q=85)
+
+## 9. They Operate Exclusively on WhatsApp or Instagram DMs
+
+There's nothing wrong with WhatsApp communication — many small legitimate agencies use it. The red flag is when that's the only way they operate. No email, no website, no physical office address. Legitimate agencies have at least a professional email and a verifiable address in the state they operate.
+
+## 10. The Group Size Is Unlimited
+
+Ask: "What is the maximum group size for this trek?" The correct answer is 10–15 people per guide. When you have 25 people and 1 guide, the guide cannot monitor everyone's acclimatisation and safety. This is dangerous on challenging terrain.
+
+## 11. They Can't Tell You Exactly What's Included
+
+Ask for a line-by-line breakdown. Every legitimate agency can tell you exactly: which meals on which days, what type of accommodation, what gear is provided, whether transport is included, and which permits are covered. "Everything is included" almost certainly means it isn't.
+
+## 12. Negative Reviews Are Replied to Aggressively
+
+Check how they respond to negative reviews. Legitimate agencies acknowledge problems and explain how they were handled. Fake or negligent agencies respond with hostility or claim the reviewer "was never their customer."
+
+## 13. Something Feels Off and You're Ignoring It
+
+Trust your instincts. If the communication has been vague, the pricing has shifted, responses take days, or something just doesn't feel right — listen to that feeling. There are hundreds of legitimate, certified, genuinely passionate adventure agencies across India. You don't need to compromise.
+
+![The reward of a safe, well-planned trek — a summit view that makes every preparation step worth it](https://images.unsplash.com/photo-1551632811-561732d1e306?w=1200&q=85)
+
+## How WildRoute Is Different
+
+WildRoute was built because we were frustrated by exactly this problem. We manually verify every agency on our platform — GST registration, guide certifications, safety equipment, and real reviews. No agency goes live without passing our checks.
+
+Browse verified agencies at wildroute.com — and if you find any agency using these tactics, report them to your state tourism board. It might save someone else's trip. Or more.`,
+  },
 ];
