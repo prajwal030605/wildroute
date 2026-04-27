@@ -76,6 +76,8 @@ export default function AgencyOnboardingPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [registrationId, setRegistrationId] = useState("");
+  const [isExistingAgency, setIsExistingAgency] = useState(false);
+  const [isCheckingExistingAgency, setIsCheckingExistingAgency] = useState(true);
 
   /* ── Page 1: Agency Details ── */
   const [name, setName] = useState("");
@@ -135,32 +137,37 @@ export default function AgencyOnboardingPage() {
 
       // Check if agency already completed onboarding — if so, skip to Step 2
       const emailToCheck = session?.email || user?.email;
-      if (emailToCheck) {
-        const { data: agencyData } = await supabase
-          .from("agencies_directory")
-          .select("*")
-          .eq("email", emailToCheck.trim().toLowerCase())
-          .eq("onboarding_complete", true)
-          .maybeSingle();
+      try {
+        if (emailToCheck) {
+          const { data: agencyData } = await supabase
+            .from("agencies_directory")
+            .select("*")
+            .eq("email", emailToCheck.trim().toLowerCase())
+            .eq("onboarding_complete", true)
+            .maybeSingle();
 
-        if (agencyData) {
-          // Pre-fill agency fields from existing record
-          setName(agencyData.name || "");
-          setLocation(agencyData.location || "");
-          setState(agencyData.state || "");
-          setAddress(agencyData.address || "");
-          setDescription(agencyData.description || "");
-          setActivities(agencyData.activities || []);
-          setEmail(agencyData.email || emailToCheck);
-          setPhone(agencyData.phone || "");
-          setWebsite(agencyData.website || "");
-          setFoundedYear(agencyData.founded_year?.toString() || "");
-          setCoverImage(agencyData.cover_image || "");
-          setPanNo(agencyData.pan_no || "");
-          setGstNo(agencyData.gst_no || "");
-          // Jump directly to trek details step
-          setStep(2);
+          if (agencyData) {
+            // Pre-fill agency fields from existing record
+            setName(agencyData.name || "");
+            setLocation(agencyData.location || "");
+            setState(agencyData.state || "");
+            setAddress(agencyData.address || "");
+            setDescription(agencyData.description || "");
+            setActivities(agencyData.activities || []);
+            setEmail(agencyData.email || emailToCheck);
+            setPhone(agencyData.phone || "");
+            setWebsite(agencyData.website || "");
+            setFoundedYear(agencyData.founded_year?.toString() || "");
+            setCoverImage(agencyData.cover_image || "");
+            setPanNo(agencyData.pan_no || "");
+            setGstNo(agencyData.gst_no || "");
+            // Jump directly to trek details — skip agency info entirely
+            setIsExistingAgency(true);
+            setStep(2);
+          }
         }
+      } finally {
+        setIsCheckingExistingAgency(false);
       }
     }
     loadSupabaseUser();
@@ -265,10 +272,12 @@ export default function AgencyOnboardingPage() {
 
       if (trekError) { setError("Save failed: " + trekError.message); return; }
 
-      // Update agency step
-      await supabase.from("agencies_directory")
-        .update({ onboarding_step: 2 })
-        .eq("email", trimmedEmail);
+      // Only update onboarding_step for new agencies (not returning ones adding more treks)
+      if (!isExistingAgency) {
+        await supabase.from("agencies_directory")
+          .update({ onboarding_step: 2 })
+          .eq("email", trimmedEmail);
+      }
 
       setStep(3);
     } finally {
@@ -314,17 +323,19 @@ export default function AgencyOnboardingPage() {
         .update({ onboarding_step: 3, onboarding_complete: true })
         .eq("email", trimmedEmail);
 
-      // Send registration confirmation email
-      await fetch("/api/send-registration-confirmation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: trimmedEmail,
-          agencyName: name,
-          registrationId,
-          trekName: trekName.trim() || null,
-        }),
-      });
+      // Only send registration confirmation email for brand-new agencies
+      if (!isExistingAgency) {
+        await fetch("/api/send-registration-confirmation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: trimmedEmail,
+            agencyName: name,
+            registrationId,
+            trekName: trekName.trim() || null,
+          }),
+        });
+      }
 
       setSuccess(true);
     } finally {
@@ -334,11 +345,17 @@ export default function AgencyOnboardingPage() {
 
   /* ── Step indicator ── */
   function StepIndicator() {
-    const steps = [
-      { num: 1, label: "Agency Details" },
-      { num: 2, label: "Trek Details" },
-      { num: 3, label: "Pricing & Logistics" },
-    ];
+    // Existing agencies adding a new trek only go through steps 2 & 3 (shown as 1 & 2)
+    const steps = isExistingAgency
+      ? [
+          { num: 2, label: "Trek Details", display: 1 },
+          { num: 3, label: "Pricing & Logistics", display: 2 },
+        ]
+      : [
+          { num: 1, label: "Agency Details", display: 1 },
+          { num: 2, label: "Trek Details", display: 2 },
+          { num: 3, label: "Pricing & Logistics", display: 3 },
+        ];
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, marginBottom: 32 }}>
         {steps.map((s, i) => (
@@ -352,7 +369,7 @@ export default function AgencyOnboardingPage() {
                 fontSize: 14, fontWeight: 700, margin: "0 auto 6px",
                 border: step === s.num ? "2px solid #2ecf9a" : "2px solid transparent",
               }}>
-                {step > s.num ? "✓" : s.num}
+                {step > s.num ? "✓" : s.display}
               </div>
               <p style={{ color: step >= s.num ? "#ccc" : "#444", fontSize: 10, margin: 0, whiteSpace: "nowrap" }}>{s.label}</p>
             </div>
@@ -365,6 +382,20 @@ export default function AgencyOnboardingPage() {
     );
   }
 
+  /* ── Loading screen while checking existing registration ── */
+  if (isCheckingExistingAgency) {
+    return (
+      <main style={{ background: "#0a0a0a", minHeight: "100vh", fontFamily: "sans-serif" }}>
+        <Navbar />
+        <section style={{ display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", minHeight: "80vh" }}>
+          <div style={{ width: 36, height: 36, border: "3px solid #222", borderTopColor: "#1D9E75", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: 20 }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          <p style={{ color: "#555", fontSize: 14 }}>Loading...</p>
+        </section>
+      </main>
+    );
+  }
+
   /* ── Success screen ── */
   if (success) {
     return (
@@ -374,12 +405,20 @@ export default function AgencyOnboardingPage() {
           <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#0F2A1E", border: "2px solid #1D9E75", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 28 }}>
             ✓
           </div>
-          <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 700, marginBottom: 12 }}>Registration complete!</h1>
+          <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 700, marginBottom: 12 }}>
+            {isExistingAgency ? "Trek added successfully!" : "Registration complete!"}
+          </h1>
           <p style={{ color: "#888", fontSize: 15, maxWidth: 460, lineHeight: 1.7, marginBottom: 8 }}>
-            Your agency <strong style={{ color: "#1D9E75" }}>{name}</strong> has been registered successfully.
+            {isExistingAgency
+              ? <><strong style={{ color: "#1D9E75" }}>{trekName}</strong> has been added to your agency listing.</>
+              : <>Your agency <strong style={{ color: "#1D9E75" }}>{name}</strong> has been registered successfully.</>
+            }
           </p>
           <p style={{ color: "#555", fontSize: 13, marginBottom: 32 }}>
-            Registration ID: <strong style={{ color: "#1D9E75" }}>{registrationId}</strong> — Our team will review and verify your listing within 24-48 hours.
+            {isExistingAgency
+              ? "Our team will review the new listing within 24-48 hours."
+              : <>Registration ID: <strong style={{ color: "#1D9E75" }}>{registrationId}</strong> — Our team will review and verify your listing within 24-48 hours.</>
+            }
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
             <button type="button" onClick={() => {
@@ -396,9 +435,10 @@ export default function AgencyOnboardingPage() {
               setRegistrationId(generateRegistrationId());
               setError("");
               setSuccess(false);
+              setIsExistingAgency(true); // Always "add trek" mode after first registration
               setStep(2);
             }} style={{ background: "#1D9E75", color: "#fff", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer" }}>
-              + Add Another Trek
+              + Add Another Activity
             </button>
             <button type="button" onClick={() => router.push("/")} style={{ background: "transparent", color: "#ccc", padding: "12px 28px", borderRadius: 8, fontSize: 14, fontWeight: 500, border: "1px solid #444", cursor: "pointer" }}>
               Go to homepage
@@ -424,11 +464,24 @@ export default function AgencyOnboardingPage() {
       }}>
         <div style={{ maxWidth: 640, width: "100%" }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <span style={{ border: "1px solid #1D9E75", color: "#1D9E75", fontSize: 11, padding: "5px 16px", borderRadius: 20, display: "inline-block", marginBottom: 16, background: "rgba(29,158,117,0.08)" }}>
-              AGENCY ONBOARDING — STEP {step} OF 3
-            </span>
-            {registrationId && (
-              <p style={{ color: "#444", fontSize: 11 }}>Registration ID: {registrationId}</p>
+            {isExistingAgency ? (
+              <div style={{ marginBottom: 16 }}>
+                <span style={{ border: "1px solid #1D9E75", color: "#1D9E75", fontSize: 11, padding: "5px 16px", borderRadius: 20, display: "inline-block", marginBottom: 10, background: "rgba(29,158,117,0.08)" }}>
+                  ADD NEW TREK — STEP {step - 1} OF 2
+                </span>
+                <p style={{ color: "#555", fontSize: 12, margin: 0 }}>
+                  Adding to: <strong style={{ color: "#aaa" }}>{name}</strong>
+                </p>
+              </div>
+            ) : (
+              <>
+                <span style={{ border: "1px solid #1D9E75", color: "#1D9E75", fontSize: 11, padding: "5px 16px", borderRadius: 20, display: "inline-block", marginBottom: 16, background: "rgba(29,158,117,0.08)" }}>
+                  AGENCY ONBOARDING — STEP {step} OF 3
+                </span>
+                {registrationId && (
+                  <p style={{ color: "#444", fontSize: 11 }}>Registration ID: {registrationId}</p>
+                )}
+              </>
             )}
           </div>
 
@@ -647,12 +700,14 @@ export default function AgencyOnboardingPage() {
                 </div>
 
                 <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-                  <button type="button" onClick={() => { setStep(1); setError(""); }} style={{
-                    padding: "14px 24px", background: "transparent", color: "#888",
-                    border: "1px solid #333", borderRadius: 10, fontSize: 14, cursor: "pointer",
-                  }}>
-                    ← Back
-                  </button>
+                  {!isExistingAgency && (
+                    <button type="button" onClick={() => { setStep(1); setError(""); }} style={{
+                      padding: "14px 24px", background: "transparent", color: "#888",
+                      border: "1px solid #333", borderRadius: 10, fontSize: 14, cursor: "pointer",
+                    }}>
+                      ← Back
+                    </button>
+                  )}
                   <button type="button" onClick={savePage2} disabled={loading} style={{
                     flex: 1, padding: 14,
                     background: "#1D9E75", color: "#fff", border: "none", borderRadius: 10,
@@ -809,7 +864,7 @@ export default function AgencyOnboardingPage() {
                     fontSize: 15, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
                     opacity: loading ? 0.6 : 1,
                   }}>
-                    {loading ? "Registering..." : "Register My Agency ✓"}
+                    {loading ? "Saving..." : isExistingAgency ? "Save Trek ✓" : "Register My Agency ✓"}
                   </button>
                 </div>
               </div>
