@@ -1,14 +1,14 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import TrekCard from "@/components/ui/TrekCard";
 import AgencyCard from "@/components/ui/AgencyCard";
-import { treks } from "@/data/treks";
-import { agencies } from "@/data/agencies";
-import { ActivityType } from "@/types";
+import { supabase } from "@/lib/supabase";
+import { mapAgency, mapTrek } from "@/lib/supabase-data";
+import type { Agency, Trek, ActivityType } from "@/types";
 
 const activityFilters = [
   { label: "All", value: "" },
@@ -51,6 +51,45 @@ function ExploreContent() {
   const [maxPrice, setMaxPrice] = useState(50000);
   const [sortBy, setSortBy] = useState<"rating" | "price_asc" | "price_desc">("rating");
 
+  // ── Live data from Supabase ──
+  const [agencies, setAgencies] = useState<Agency[]>([]);
+  const [treks, setTreks] = useState<Trek[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchLiveData() {
+      // Only verified, fully-onboarded agencies
+      const { data: agencyRows } = await supabase
+        .from("agencies_directory")
+        .select("*")
+        .eq("verified", true)
+        .eq("onboarding_complete", true)
+        .order("created_at", { ascending: false });
+
+      // All treks belonging to those agencies
+      const { data: trekRows } = await supabase
+        .from("agency_treks")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      const mappedAgencies = (agencyRows || []).map(mapAgency);
+
+      // Only include treks that have a price set and belong to a verified agency
+      const verifiedEmails = new Set((agencyRows || []).map(a => String(a.email)));
+      const mappedTreks = (trekRows || [])
+        .filter(row => verifiedEmails.has(String(row.agency_email)) && Number(row.price_per_person) > 0)
+        .map(row => {
+          const agencyRow = (agencyRows || []).find(a => String(a.email) === String(row.agency_email));
+          return mapTrek(row, agencyRow);
+        });
+
+      setAgencies(mappedAgencies);
+      setTreks(mappedTreks);
+      setDataLoading(false);
+    }
+    fetchLiveData();
+  }, []);
+
   const filteredTreks = useMemo(() => {
     let result = [...treks];
     if (query) {
@@ -67,7 +106,7 @@ function ExploreContent() {
     if (sortBy === "price_asc") result.sort((a, b) => a.price - b.price);
     if (sortBy === "price_desc") result.sort((a, b) => b.price - a.price);
     return result;
-  }, [query, activityFilter, difficultyFilter, stateFilter, maxPrice, sortBy]);
+  }, [treks, query, activityFilter, difficultyFilter, stateFilter, maxPrice, sortBy]);
 
   const filteredAgencies = useMemo(() => {
     let result = [...agencies];
@@ -81,7 +120,7 @@ function ExploreContent() {
     if (stateFilter !== "All states") result = result.filter((a) => a.state === stateFilter);
     result.sort((a, b) => b.rating - a.rating);
     return result;
-  }, [query, activityFilter, stateFilter]);
+  }, [agencies, query, activityFilter, stateFilter]);
 
   return (
     <main style={{ background: "#0a0a0a", minHeight: "100vh", fontFamily: "sans-serif" }}>
@@ -92,7 +131,7 @@ function ExploreContent() {
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px 0" }}>
           <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 700, marginBottom: 6 }}>Explore adventures</h1>
           <p style={{ color: "#666", fontSize: 14, marginBottom: 24 }}>
-            {filteredTreks.length} treks · {filteredAgencies.length} agencies across India
+            {dataLoading ? "Loading..." : `${filteredTreks.length} treks · ${filteredAgencies.length} agencies across India`}
           </p>
 
           {/* Search bar */}
@@ -220,7 +259,15 @@ function ExploreContent() {
             </div>
           )}
 
-          {view === "treks" ? (
+          {dataLoading ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} style={{ background: "#111", borderRadius: 14, height: 280, border: "1px solid #1a1a1a", animation: "pulse 1.5s ease-in-out infinite" }}>
+                  <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }`}</style>
+                </div>
+              ))}
+            </div>
+          ) : view === "treks" ? (
             filteredTreks.length > 0 ? (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
                 {filteredTreks.map((trek) => <TrekCard key={trek.id} trek={trek} />)}

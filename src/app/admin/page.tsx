@@ -403,11 +403,28 @@ function AgencyList() {
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState<Array<Record<string, unknown>>>([]);
   const [fetched, setFetched] = useState(false);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "pending" | "verified">("all");
 
   async function fetchAgencies() {
     setLoading(true);
     const { data } = await supabase.from("agencies_directory").select("*").order("created_at", { ascending: false });
     setList(data || []); setLoading(false); setFetched(true);
+  }
+
+  async function toggleVerified(registrationId: string, currentVerified: boolean) {
+    setApprovingId(registrationId);
+    const newVerified = !currentVerified;
+    const { error } = await supabase
+      .from("agencies_directory")
+      .update({ verified: newVerified })
+      .eq("registration_id", registrationId);
+    if (!error) {
+      setList(prev => prev.map(a =>
+        String(a.registration_id) === registrationId ? { ...a, verified: newVerified } : a
+      ));
+    }
+    setApprovingId(null);
   }
 
   if (!fetched) return (
@@ -419,46 +436,112 @@ function AgencyList() {
 
   if (loading) return <div style={{ color: "#555", textAlign: "center", paddingTop: 80 }}>Loading...</div>;
 
+  const displayList = list.filter(a => {
+    if (filter === "pending") return !a.verified && a.onboarding_complete;
+    if (filter === "verified") return a.verified;
+    return true;
+  });
+
+  const pendingCount = list.filter(a => !a.verified && a.onboarding_complete).length;
+
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <div>
           <h1 style={{ color: "#fff", fontSize: 22, fontWeight: 700, marginBottom: 4 }}>All agencies</h1>
-          <p style={{ color: "#555", fontSize: 14 }}>{list.length} agencies in database</p>
+          <p style={{ color: "#555", fontSize: 14 }}>{list.length} total · {pendingCount} awaiting approval</p>
         </div>
         <button onClick={fetchAgencies} style={{ background: "transparent", color: "#1D9E75", border: "1px solid #1D9E75", borderRadius: 8, padding: "8px 16px", fontSize: 13, cursor: "pointer" }}>Refresh</button>
       </div>
-      {list.length === 0 ? (
+
+      {/* Filter tabs */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        {(["all", "pending", "verified"] as const).map(f => (
+          <button key={f} onClick={() => setFilter(f)} style={{
+            padding: "6px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer", border: "none",
+            background: filter === f ? "#1D9E75" : "#1a1a1a",
+            color: filter === f ? "#fff" : "#666", fontWeight: 500,
+          }}>
+            {f === "all" ? `All (${list.length})` : f === "pending" ? `Pending (${pendingCount})` : `Verified (${list.filter(a => a.verified).length})`}
+          </button>
+        ))}
+      </div>
+
+      {displayList.length === 0 ? (
         <div style={{ textAlign: "center", paddingTop: 60 }}>
           <p style={{ fontSize: 36, marginBottom: 12 }}>🏕️</p>
-          <p style={{ color: "#fff", fontSize: 16, fontWeight: 600, marginBottom: 6 }}>No agencies yet</p>
-          <p style={{ color: "#555", fontSize: 14 }}>Add your first agency using the form.</p>
+          <p style={{ color: "#fff", fontSize: 16, fontWeight: 600, marginBottom: 6 }}>
+            {filter === "pending" ? "No pending requests" : "No agencies yet"}
+          </p>
+          <p style={{ color: "#555", fontSize: 14 }}>
+            {filter === "pending" ? "All complete registrations have been reviewed." : "Add your first agency using the form."}
+          </p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {list.map((agency) => (
-            <div key={String(agency.id)} style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 14, padding: "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
-              <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-                <div style={{ width: 44, height: 44, borderRadius: 10, background: "#0F2A1E", display: "flex", alignItems: "center", justifyContent: "center", color: "#1D9E75", fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
-                  {String(agency.name || "?").charAt(0)}
-                </div>
-                <div>
-                  <p style={{ color: "#fff", fontSize: 15, fontWeight: 600, margin: "0 0 3px" }}>{String(agency.name)}</p>
-                  <p style={{ color: "#555", fontSize: 12, margin: 0 }}>📍 {String(agency.location)}, {String(agency.state)} · {String(agency.email)}</p>
-                  {Array.isArray(agency.activities) && (
-                    <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
-                      {(agency.activities as string[]).map((a) => (
-                        <span key={a} style={{ background: "#0F2A1E", color: "#1D9E75", fontSize: 10, padding: "2px 8px", borderRadius: 6 }}>{a}</span>
-                      ))}
+          {displayList.map((agency) => {
+            const regId = String(agency.registration_id || agency.id);
+            const isApproving = approvingId === regId;
+            const isComplete = Boolean(agency.onboarding_complete);
+            const isVerified = Boolean(agency.verified);
+
+            return (
+              <div key={regId} style={{
+                background: "#111",
+                border: `1px solid ${isVerified ? "#1D9E7533" : "#1a1a1a"}`,
+                borderRadius: 14, padding: "18px 20px",
+                display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16,
+              }}>
+                <div style={{ display: "flex", gap: 14, alignItems: "center", flex: 1, minWidth: 0 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 10, background: isVerified ? "#0F2A1E" : "#1a1a1a", display: "flex", alignItems: "center", justifyContent: "center", color: isVerified ? "#1D9E75" : "#555", fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
+                    {String(agency.name || "?").charAt(0)}
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <p style={{ color: "#fff", fontSize: 15, fontWeight: 600, margin: "0 0 3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{String(agency.name)}</p>
+                      {isVerified && (
+                        <span style={{ background: "#0F2A1E", color: "#1D9E75", fontSize: 10, padding: "2px 8px", borderRadius: 6, flexShrink: 0 }}>Listed</span>
+                      )}
+                      {!isComplete && (
+                        <span style={{ background: "#1a1a1a", color: "#555", fontSize: 10, padding: "2px 8px", borderRadius: 6, flexShrink: 0 }}>Incomplete</span>
+                      )}
                     </div>
-                  )}
+                    <p style={{ color: "#555", fontSize: 12, margin: "0 0 4px" }}>📍 {String(agency.location)}, {String(agency.state)} · {String(agency.email)}</p>
+                    {Array.isArray(agency.activities) && (
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        {(agency.activities as string[]).map((a) => (
+                          <span key={a} style={{ background: "#0F2A1E", color: "#1D9E75", fontSize: 10, padding: "2px 8px", borderRadius: 6 }}>{a}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* Action */}
+                {isComplete ? (
+                  <button
+                    onClick={() => toggleVerified(regId, isVerified)}
+                    disabled={isApproving}
+                    style={{
+                      padding: "8px 18px", borderRadius: 8, fontSize: 12, fontWeight: 600,
+                      cursor: isApproving ? "not-allowed" : "pointer",
+                      border: "none", flexShrink: 0,
+                      background: isVerified ? "transparent" : "#1D9E75",
+                      color: isVerified ? "#EF4444" : "#fff",
+                      outline: isVerified ? "1px solid #EF444433" : "none",
+                      opacity: isApproving ? 0.6 : 1,
+                    }}
+                  >
+                    {isApproving ? "Saving..." : isVerified ? "Revoke listing" : "Approve & List →"}
+                  </button>
+                ) : (
+                  <span style={{ padding: "6px 12px", borderRadius: 20, fontSize: 11, fontWeight: 500, background: "#1a1a1a", color: "#555", flexShrink: 0 }}>
+                    Incomplete
+                  </span>
+                )}
               </div>
-              <span style={{ padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 500, background: agency.verified ? "#0F2A1E" : "#1a1a1a", color: agency.verified ? "#1D9E75" : "#555" }}>
-                {agency.verified ? "✓ Verified" : "Pending"}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

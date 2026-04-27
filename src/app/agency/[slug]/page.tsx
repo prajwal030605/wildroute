@@ -4,24 +4,38 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import TrekCard from "@/components/ui/TrekCard";
 import EnquiryForm from "@/components/ui/EnquiryForm";
-import { agencies } from "@/data/agencies";
-import { treks } from "@/data/treks";
+import { supabase } from "@/lib/supabase";
+import { mapAgency, mapTrek } from "@/lib/supabase-data";
 
 const activityEmoji: Record<string, string> = {
   trekking: "🥾", rafting: "🚣", paragliding: "🪂", bungee: "🪢",
   camping: "⛺", cycling: "🚵", skiing: "⛷️", "rock-climbing": "🧗",
 };
 
-export function generateStaticParams() {
-  return agencies.map((a) => ({ slug: a.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function AgencyPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const agency = agencies.find((a) => a.slug === slug);
-  if (!agency) return notFound();
 
-  const agencyTreks = treks.filter((t) => t.agencyId === agency.id);
+  // Fetch live agency data — only show if verified
+  const { data: agencyRow } = await supabase
+    .from("agencies_directory")
+    .select("*")
+    .eq("slug", slug)
+    .eq("verified", true)
+    .maybeSingle();
+
+  if (!agencyRow) return notFound();
+
+  // Fetch all treks for this agency
+  const { data: trekRows } = await supabase
+    .from("agency_treks")
+    .select("*")
+    .eq("agency_email", String(agencyRow.email))
+    .order("created_at", { ascending: false });
+
+  const agency = mapAgency(agencyRow);
+  const agencyTreks = (trekRows || []).map(row => mapTrek(row, agencyRow));
   const startingPrice = agencyTreks.length > 0 ? Math.min(...agencyTreks.map((t) => t.price)) : null;
 
   return (

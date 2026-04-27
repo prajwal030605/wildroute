@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { treks } from "@/data/treks";
-import { agencies } from "@/data/agencies";
 import EnquiryForm from "@/components/ui/EnquiryForm";
+import { supabase } from "@/lib/supabase";
+import { mapAgency, mapTrek } from "@/lib/supabase-data";
 
 const difficultyColor: Record<string, string> = {
   easy: "#1D9E75", moderate: "#F59E0B", hard: "#EF4444", extreme: "#7C3AED",
@@ -14,16 +14,32 @@ const activityEmoji: Record<string, string> = {
   camping: "⛺", cycling: "🚵", skiing: "⛷️", "rock-climbing": "🧗",
 };
 
-export function generateStaticParams() {
-  return treks.map((t) => ({ slug: t.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function TrekPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const trek = treks.find((t) => t.slug === slug);
-  if (!trek) return notFound();
 
-  const agency = agencies.find((a) => a.id === trek.agencyId);
+  // Fetch trek from Supabase
+  const { data: trekRow } = await supabase
+    .from("agency_treks")
+    .select("*")
+    .eq("trek_slug", slug)
+    .maybeSingle();
+
+  if (!trekRow) return notFound();
+
+  // Fetch the agency that owns this trek (must be verified)
+  const { data: agencyRow } = await supabase
+    .from("agencies_directory")
+    .select("*")
+    .eq("email", String(trekRow.agency_email))
+    .eq("verified", true)
+    .maybeSingle();
+
+  if (!agencyRow) return notFound();
+
+  const trek = mapTrek(trekRow, agencyRow);
+  const agency = mapAgency(agencyRow);
 
   return (
     <main style={{ background: "#0a0a0a", minHeight: "100vh", fontFamily: "sans-serif" }}>
