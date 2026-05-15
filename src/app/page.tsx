@@ -105,66 +105,94 @@ export default function Home() {
 
       {/* ── HERO ── */}
       <section style={{
-        paddingTop: viewer?.role === "user" ? 168 : 120, paddingBottom: 80, textAlign: "center",
-        background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(29,158,117,0.12) 0%, transparent 70%)",
-        padding: "120px 24px 80px",
+        position: "relative",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        overflow: "hidden",
+        paddingTop: viewer?.role === "user" ? 104 : 64,
       }}>
-        <span style={{
-          border: "1px solid #1D9E75", color: "#1D9E75", fontSize: 11,
-          padding: "5px 16px", borderRadius: 20, display: "inline-block", marginBottom: 24,
-          background: "rgba(29,158,117,0.08)",
-        }}>
-          LAUNCHING SOON · INDIA&apos;S ADVENTURE PLATFORM
-        </span>
-
-        <h1 style={{ color: "#fff", fontSize: "clamp(32px, 6vw, 58px)", fontWeight: 800, maxWidth: 720, margin: "0 auto 20px", lineHeight: 1.15 }}>
-          Find &amp; book your next<br />
-          <span style={{ color: "#1D9E75" }}>real adventure</span>
-        </h1>
-
-        <p style={{ color: "#888", fontSize: 17, maxWidth: 500, margin: "0 auto 44px", lineHeight: 1.7 }}>
-          Compare verified trekking, rafting, and paragliding agencies across India. Transparent pricing. Real reviews. Safe booking.
-        </p>
-
-        {/* Search bar */}
+        {/* Mountain background image */}
         <div style={{
-          maxWidth: 560, margin: "0 auto 20px",
-          display: "flex", background: "#111", border: "1px solid #222",
-          borderRadius: 14, overflow: "hidden",
-        }}>
-          <input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && (window.location.href = `/explore?q=${searchQuery}`)}
-            placeholder="Search treks, destinations, activities..."
-            style={{
-              flex: 1, background: "transparent", border: "none",
-              padding: "16px 20px", fontSize: 15, color: "#fff", outline: "none",
-            }}
-          />
-          <Link href={`/explore${searchQuery ? `?q=${searchQuery}` : ""}`} style={{
-            background: "#1D9E75", color: "#fff", padding: "0 24px",
-            display: "flex", alignItems: "center", textDecoration: "none",
-            fontSize: 14, fontWeight: 500, whiteSpace: "nowrap",
-          }}>
-            Search →
-          </Link>
-        </div>
+          position: "absolute", inset: 0,
+          backgroundImage: "url(https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&auto=format&fit=crop&q=80)",
+          backgroundSize: "cover",
+          backgroundPosition: "center 40%",
+        }} />
+        {/* Multi-layer overlay for text readability */}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.35) 40%, rgba(10,10,10,0.85) 80%, #0a0a0a 100%)" }} />
+        {/* Green tint at top */}
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(29,158,117,0.15) 0%, transparent 60%)" }} />
 
-        {/* Activity pills */}
-        <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
-          {activities.map((a) => (
-            <Link key={a.type} href={`/explore?type=${a.type}`} style={{
-              background: "#111", border: "1px solid #222", color: "#aaa",
-              padding: "8px 16px", borderRadius: 30, fontSize: 13, textDecoration: "none",
-              display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s",
-            }}
-              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1D9E75"; (e.currentTarget as HTMLAnchorElement).style.color = "#fff"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#222"; (e.currentTarget as HTMLAnchorElement).style.color = "#aaa"; }}
-            >
-              {a.emoji} {a.label}
+        {/* Content */}
+        <div style={{ position: "relative", zIndex: 2, padding: "0 24px", maxWidth: 800, width: "100%" }}>
+          <span style={{
+            border: "1px solid rgba(29,158,117,0.6)", color: "#1D9E75", fontSize: 11,
+            padding: "5px 16px", borderRadius: 20, display: "inline-block", marginBottom: 28,
+            background: "rgba(29,158,117,0.12)", backdropFilter: "blur(8px)",
+          }}>
+            LAUNCHING SOON · INDIA&apos;S ADVENTURE PLATFORM
+          </span>
+
+          <h1 style={{ color: "#fff", fontSize: "clamp(36px, 6vw, 64px)", fontWeight: 900, maxWidth: 720, margin: "0 auto 20px", lineHeight: 1.1, textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
+            Find &amp; book your next<br />
+            <span style={{ color: "#1D9E75" }}>real adventure</span>
+          </h1>
+
+          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 17, maxWidth: 500, margin: "0 auto 44px", lineHeight: 1.7, textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
+            Compare verified trekking, rafting, and paragliding agencies across India. Transparent pricing. Real reviews. Safe booking.
+          </p>
+
+          {/* Search bar */}
+          <div style={{
+            maxWidth: 580, margin: "0 auto 20px",
+            display: "flex", background: "rgba(10,10,10,0.85)", border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 14, overflow: "hidden", backdropFilter: "blur(12px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+          }}>
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && (window.location.href = `/explore?q=${searchQuery}`)}
+              placeholder="Search treks, destinations, activities..."
+              style={{
+                flex: 1, background: "transparent", border: "none",
+                padding: "18px 20px", fontSize: 15, color: "#fff", outline: "none",
+              }}
+            />
+            <Link href={`/explore${searchQuery ? `?q=${searchQuery}` : ""}`} style={{
+              background: "#1D9E75", color: "#fff", padding: "0 28px",
+              display: "flex", alignItems: "center", textDecoration: "none",
+              fontSize: 14, fontWeight: 600, whiteSpace: "nowrap",
+            }}>
+              Search →
             </Link>
-          ))}
+          </div>
+
+          {/* Activity pills */}
+          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+            {activities.map((a) => (
+              <Link key={a.type} href={`/explore?type=${a.type}`} style={{
+                background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.75)",
+                padding: "8px 16px", borderRadius: 30, fontSize: 13, textDecoration: "none",
+                display: "flex", alignItems: "center", gap: 6, backdropFilter: "blur(8px)",
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1D9E75"; (e.currentTarget as HTMLAnchorElement).style.color = "#fff"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.15)"; (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.75)"; }}
+              >
+                {a.emoji} {a.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Scroll hint */}
+          <div style={{ marginTop: 48, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, opacity: 0.4 }}>
+            <span style={{ color: "#fff", fontSize: 11, letterSpacing: "0.1em" }}>SCROLL TO EXPLORE</span>
+            <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, #fff, transparent)" }} />
+          </div>
         </div>
       </section>
 
