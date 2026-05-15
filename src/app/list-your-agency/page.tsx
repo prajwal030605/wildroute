@@ -3,9 +3,27 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import type { Metadata } from "next";
 
+const BASE_URL = "https://gowildroute.com";
+
 export const metadata: Metadata = {
-  title: "List Your Agency on WildRoute",
+  title: "List Your Agency on WildRoute — Reach Thousands of Trekkers",
   description: "Get your adventure agency listed on WildRoute. Reach thousands of trekkers across India. Free for 6 months, no commission.",
+  alternates: {
+    canonical: `${BASE_URL}/list-your-agency`,
+  },
+  openGraph: {
+    type: "website",
+    url: `${BASE_URL}/list-your-agency`,
+    title: "List Your Agency on WildRoute — Reach Thousands of Trekkers",
+    description: "Get your adventure agency listed on WildRoute. Reach thousands of trekkers across India. Free for 6 months, no commission.",
+    images: [{ url: `${BASE_URL}/og-image.png`, width: 1200, height: 630, alt: "List your agency on WildRoute" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "List Your Agency on WildRoute",
+    description: "Reach thousands of trekkers across India. Free for 6 months, no commission.",
+    images: [`${BASE_URL}/og-image.png`],
+  },
 };
 
 const steps = [

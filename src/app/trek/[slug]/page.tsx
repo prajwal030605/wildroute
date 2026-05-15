@@ -14,6 +14,45 @@ const activityEmoji: Record<string, string> = {
   camping: "⛺", cycling: "🚵", skiing: "⛷️", "rock-climbing": "🧗",
 };
 
+import type { Metadata } from "next";
+
+const BASE_URL = "https://gowildroute.com";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const { data: trekRow } = await supabase
+    .from("agency_treks")
+    .select("trek_name, trek_description, trek_photos, trek_slug, destination, state_name")
+    .eq("trek_slug", slug)
+    .maybeSingle();
+
+  if (!trekRow) return {};
+  const title = `${trekRow.trek_name} | WildRoute`;
+  const description = trekRow.trek_description?.slice(0, 155) || `Book ${trekRow.trek_name} trek in ${trekRow.destination}, ${trekRow.state_name} with verified agencies on WildRoute.`;
+  const image = trekRow.trek_photos?.[0] || `${BASE_URL}/og-image.png`;
+  const url = `${BASE_URL}/trek/${slug}`;
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      url,
+      title,
+      description,
+      images: [{ url: image, width: 1200, height: 630, alt: trekRow.trek_name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function TrekPage({ params }: { params: Promise<{ slug: string }> }) {
