@@ -63,14 +63,12 @@ function ExploreContent() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ── Live data from Supabase ──
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [treks, setTreks] = useState<Trek[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     async function fetchLiveData() {
-      // Only verified, fully-onboarded agencies
       const { data: agencyRows } = await supabase
         .from("agencies_directory")
         .select("*")
@@ -78,15 +76,12 @@ function ExploreContent() {
         .eq("onboarding_complete", true)
         .order("created_at", { ascending: false });
 
-      // All treks belonging to those agencies
       const { data: trekRows } = await supabase
         .from("agency_treks")
         .select("*")
         .order("created_at", { ascending: false });
 
       const mappedAgencies = (agencyRows || []).map(mapAgency);
-
-      // Only include treks that have a price set and belong to a verified agency
       const verifiedEmails = new Set((agencyRows || []).map(a => String(a.email)));
       const mappedTreks = (trekRows || [])
         .filter(row => verifiedEmails.has(String(row.agency_email)) && Number(row.price_per_person) > 0)
@@ -146,26 +141,30 @@ function ExploreContent() {
     setStateFilter("All states"); setMaxPrice(50000); setQuery("");
   }
 
+  const filterActive = filtersOpen || activeFilterCount > 0;
+
   return (
-    <main style={{ background: "#0a0a0a", minHeight: "100vh", fontFamily: "sans-serif" }}>
+    <main style={{ background: "var(--wr-bg)", minHeight: "100vh", fontFamily: "sans-serif", transition: "background 0.2s" }}>
       <Navbar />
 
       {/* ── Top bar ── */}
-      <section style={{ paddingTop: 88, background: "#0a0a0a", borderBottom: "1px solid #1a1a1a" }}>
+      <section style={{ paddingTop: 88, background: "var(--wr-bg)", borderBottom: "1px solid var(--wr-border)", transition: "background 0.2s, border-color 0.2s" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 24px 0" }}>
-          <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 700, marginBottom: 4 }}>Explore adventures</h1>
-          <p style={{ color: "#555", fontSize: 13, marginBottom: 20 }}>
+          <h1 style={{ color: "var(--wr-text)", fontSize: 26, fontWeight: 700, marginBottom: 4 }}>Explore adventures</h1>
+          <p style={{ color: "var(--wr-text-faint)", fontSize: 13, marginBottom: 20 }}>
             {dataLoading ? "Loading..." : `${filteredTreks.length} treks · ${filteredAgencies.length} agencies across India`}
           </p>
 
           {/* Search + Filters row */}
           <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
             {/* Search */}
-            <div style={{ display: "flex", background: "#111", border: "1px solid #222", borderRadius: 10, overflow: "hidden", flex: "1 1 280px", maxWidth: 500 }}>
+            <div style={{ display: "flex", background: "var(--wr-card)", border: "1px solid var(--wr-border-strong)", borderRadius: 10, overflow: "hidden", flex: "1 1 280px", maxWidth: 500 }}>
               <input value={query} onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search treks, destinations..."
-                style={{ flex: 1, background: "transparent", border: "none", padding: "11px 16px", fontSize: 14, color: "#fff", outline: "none" }} />
-              {query && <button onClick={() => setQuery("")} style={{ background: "none", border: "none", color: "#555", padding: "0 12px", cursor: "pointer" }}>✕</button>}
+                style={{ flex: 1, background: "transparent", border: "none", padding: "11px 16px", fontSize: 14, color: "var(--wr-text)", outline: "none" }} />
+              {query && (
+                <button onClick={() => setQuery("")} style={{ background: "none", border: "none", color: "var(--wr-text-faint)", padding: "0 12px", cursor: "pointer" }}>✕</button>
+              )}
             </div>
 
             {/* Single Filters button */}
@@ -174,14 +173,15 @@ function ExploreContent() {
                 display: "flex", alignItems: "center", gap: 8,
                 padding: "11px 18px", borderRadius: 10, fontSize: 13, fontWeight: 500,
                 cursor: "pointer",
-                background: filtersOpen || activeFilterCount > 0 ? "#0F2A1E" : "#111",
-                border: `1px solid ${filtersOpen || activeFilterCount > 0 ? "#1D9E75" : "#222"}`,
-                color: filtersOpen || activeFilterCount > 0 ? "#1D9E75" : "#888",
+                background: filterActive ? "var(--wr-green-bg)" : "var(--wr-card)",
+                border: `1px solid ${filterActive ? "var(--wr-green)" : "var(--wr-border-strong)"}`,
+                color: filterActive ? "var(--wr-green)" : "var(--wr-text-muted)",
+                transition: "all 0.2s",
               }}>
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v1.5L9 10v5l-2-1V10L1 4.5V3z"/></svg>
                 Filters
                 {activeFilterCount > 0 && (
-                  <span style={{ background: "#1D9E75", color: "#fff", borderRadius: "50%", width: 18, height: 18, fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ background: "var(--wr-green)", color: "#fff", borderRadius: "50%", width: 18, height: 18, fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {activeFilterCount}
                   </span>
                 )}
@@ -191,20 +191,21 @@ function ExploreContent() {
               {filtersOpen && (
                 <div style={{
                   position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 100,
-                  background: "#111", border: "1px solid #222", borderRadius: 14,
-                  padding: 20, minWidth: 520, boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+                  background: "var(--wr-card)", border: "1px solid var(--wr-border-strong)", borderRadius: 14,
+                  padding: 20, minWidth: 520, boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
                   display: "grid", gridTemplateColumns: view === "treks" ? "1fr 1fr 1fr" : "1fr 1fr", gap: 20,
+                  transition: "background 0.2s",
                 }}>
                   {/* Difficulty — treks only */}
                   {view === "treks" && (
                     <div>
-                      <p style={{ color: "#555", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 10 }}>DIFFICULTY</p>
+                      <p style={{ color: "var(--wr-text-faint)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 10 }}>DIFFICULTY</p>
                       {difficultyFilters.map(f => (
                         <button key={f.value} onClick={() => setDifficultyFilter(f.value)} style={{
                           display: "block", width: "100%", textAlign: "left", padding: "7px 10px",
                           borderRadius: 8, fontSize: 13, cursor: "pointer", border: "none", marginBottom: 3,
-                          background: difficultyFilter === f.value ? "#0F2A1E" : "transparent",
-                          color: difficultyFilter === f.value ? "#1D9E75" : "#888",
+                          background: difficultyFilter === f.value ? "var(--wr-green-bg)" : "transparent",
+                          color: difficultyFilter === f.value ? "var(--wr-green)" : "var(--wr-text-muted)",
                         }}>{f.label}</button>
                       ))}
                     </div>
@@ -212,13 +213,13 @@ function ExploreContent() {
 
                   {/* Location */}
                   <div>
-                    <p style={{ color: "#555", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 10 }}>LOCATION</p>
+                    <p style={{ color: "var(--wr-text-faint)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 10 }}>LOCATION</p>
                     {stateFilters.map(s => (
                       <button key={s} onClick={() => setStateFilter(s)} style={{
                         display: "block", width: "100%", textAlign: "left", padding: "7px 10px",
                         borderRadius: 8, fontSize: 13, cursor: "pointer", border: "none", marginBottom: 3,
-                        background: stateFilter === s ? "#0F2A1E" : "transparent",
-                        color: stateFilter === s ? "#1D9E75" : "#888",
+                        background: stateFilter === s ? "var(--wr-green-bg)" : "transparent",
+                        color: stateFilter === s ? "var(--wr-green)" : "var(--wr-text-muted)",
                       }}>{s}</button>
                     ))}
                   </div>
@@ -226,24 +227,24 @@ function ExploreContent() {
                   {/* Budget — treks only */}
                   {view === "treks" && (
                     <div>
-                      <p style={{ color: "#555", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 10 }}>MAX BUDGET</p>
-                      <p style={{ color: "#1D9E75", fontSize: 20, fontWeight: 700, marginBottom: 12 }}>₹{maxPrice.toLocaleString("en-IN")}</p>
+                      <p style={{ color: "var(--wr-text-faint)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 10 }}>MAX BUDGET</p>
+                      <p style={{ color: "var(--wr-green)", fontSize: 20, fontWeight: 700, marginBottom: 12 }}>₹{maxPrice.toLocaleString("en-IN")}</p>
                       <input type="range" min={1000} max={50000} step={500} value={maxPrice}
                         onChange={(e) => setMaxPrice(Number(e.target.value))}
-                        style={{ width: "100%", accentColor: "#1D9E75", marginBottom: 6 }} />
+                        style={{ width: "100%", accentColor: "var(--wr-green)", marginBottom: 6 }} />
                       <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ color: "#444", fontSize: 11 }}>₹1K</span>
-                        <span style={{ color: "#444", fontSize: 11 }}>₹50K</span>
+                        <span style={{ color: "var(--wr-text-faint)", fontSize: 11 }}>₹1K</span>
+                        <span style={{ color: "var(--wr-text-faint)", fontSize: 11 }}>₹50K</span>
                       </div>
                     </div>
                   )}
 
-                  {/* Actions — full row */}
-                  <div style={{ gridColumn: "1 / -1", borderTop: "1px solid #1a1a1a", paddingTop: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <button onClick={resetAll} style={{ background: "transparent", border: "none", color: "#555", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>
+                  {/* Actions */}
+                  <div style={{ gridColumn: "1 / -1", borderTop: "1px solid var(--wr-border)", paddingTop: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <button onClick={resetAll} style={{ background: "transparent", border: "none", color: "var(--wr-text-faint)", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>
                       Reset all
                     </button>
-                    <button onClick={() => setFiltersOpen(false)} style={{ background: "#1D9E75", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                    <button onClick={() => setFiltersOpen(false)} style={{ background: "var(--wr-green)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                       Apply filters
                     </button>
                   </div>
@@ -252,11 +253,19 @@ function ExploreContent() {
             </div>
 
             {/* View toggle */}
-            <div style={{ display: "flex", border: "1px solid #222", borderRadius: 10, overflow: "hidden", marginLeft: "auto" }}>
-              <button onClick={() => setView("treks")} style={{ padding: "11px 18px", fontSize: 13, cursor: "pointer", border: "none", background: view === "treks" ? "#1D9E75" : "transparent", color: view === "treks" ? "#fff" : "#666", fontWeight: 500 }}>
+            <div style={{ display: "flex", border: "1px solid var(--wr-border-strong)", borderRadius: 10, overflow: "hidden", marginLeft: "auto" }}>
+              <button onClick={() => setView("treks")} style={{
+                padding: "11px 18px", fontSize: 13, cursor: "pointer", border: "none",
+                background: view === "treks" ? "var(--wr-green)" : "transparent",
+                color: view === "treks" ? "#fff" : "var(--wr-text-muted)", fontWeight: 500,
+              }}>
                 Treks & Activities
               </button>
-              <button onClick={() => setView("agencies")} style={{ padding: "11px 18px", fontSize: 13, cursor: "pointer", border: "none", background: view === "agencies" ? "#1D9E75" : "transparent", color: view === "agencies" ? "#fff" : "#666", fontWeight: 500 }}>
+              <button onClick={() => setView("agencies")} style={{
+                padding: "11px 18px", fontSize: 13, cursor: "pointer", border: "none",
+                background: view === "agencies" ? "var(--wr-green)" : "transparent",
+                color: view === "agencies" ? "#fff" : "var(--wr-text-muted)", fontWeight: 500,
+              }}>
                 Agencies
               </button>
             </div>
@@ -267,10 +276,10 @@ function ExploreContent() {
             {activityFilters.map((f) => (
               <button key={f.value} onClick={() => setActivityFilter(f.value)} style={{
                 padding: "6px 14px", borderRadius: 30, fontSize: 12, cursor: "pointer", fontWeight: 500,
-                border: activityFilter === f.value ? "1px solid #1D9E75" : "1px solid #222",
-                background: activityFilter === f.value ? "#0F2A1E" : "transparent",
-                color: activityFilter === f.value ? "#1D9E75" : "#555",
-                whiteSpace: "nowrap", flexShrink: 0,
+                border: activityFilter === f.value ? "1px solid var(--wr-green)" : "1px solid var(--wr-border-strong)",
+                background: activityFilter === f.value ? "var(--wr-green-bg)" : "transparent",
+                color: activityFilter === f.value ? "var(--wr-green)" : "var(--wr-text-faint)",
+                whiteSpace: "nowrap", flexShrink: 0, transition: "all 0.15s",
               }}>
                 {f.label}
               </button>
@@ -281,18 +290,18 @@ function ExploreContent() {
           {activeFilterCount > 0 && (
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", paddingBottom: 12 }}>
               {difficultyFilter && (
-                <span style={{ background: "#0F2A1E", border: "1px solid #1D9E7544", color: "#1D9E75", fontSize: 11, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 6 }}>
-                  {difficultyFilter} <button onClick={() => setDifficultyFilter("")} style={{ background: "none", border: "none", color: "#1D9E75", cursor: "pointer", padding: 0, fontSize: 12 }}>✕</button>
+                <span style={{ background: "var(--wr-green-bg)", border: "1px solid var(--wr-green-border)", color: "var(--wr-green)", fontSize: 11, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 6 }}>
+                  {difficultyFilter} <button onClick={() => setDifficultyFilter("")} style={{ background: "none", border: "none", color: "var(--wr-green)", cursor: "pointer", padding: 0, fontSize: 12 }}>✕</button>
                 </span>
               )}
               {stateFilter !== "All states" && (
-                <span style={{ background: "#0F2A1E", border: "1px solid #1D9E7544", color: "#1D9E75", fontSize: 11, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 6 }}>
-                  {stateFilter} <button onClick={() => setStateFilter("All states")} style={{ background: "none", border: "none", color: "#1D9E75", cursor: "pointer", padding: 0, fontSize: 12 }}>✕</button>
+                <span style={{ background: "var(--wr-green-bg)", border: "1px solid var(--wr-green-border)", color: "var(--wr-green)", fontSize: 11, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 6 }}>
+                  {stateFilter} <button onClick={() => setStateFilter("All states")} style={{ background: "none", border: "none", color: "var(--wr-green)", cursor: "pointer", padding: 0, fontSize: 12 }}>✕</button>
                 </span>
               )}
               {maxPrice < 50000 && (
-                <span style={{ background: "#0F2A1E", border: "1px solid #1D9E7544", color: "#1D9E75", fontSize: 11, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 6 }}>
-                  Max ₹{maxPrice.toLocaleString("en-IN")} <button onClick={() => setMaxPrice(50000)} style={{ background: "none", border: "none", color: "#1D9E75", cursor: "pointer", padding: 0, fontSize: 12 }}>✕</button>
+                <span style={{ background: "var(--wr-green-bg)", border: "1px solid var(--wr-green-border)", color: "var(--wr-green)", fontSize: 11, padding: "3px 10px", borderRadius: 20, display: "flex", alignItems: "center", gap: 6 }}>
+                  Max ₹{maxPrice.toLocaleString("en-IN")} <button onClick={() => setMaxPrice(50000)} style={{ background: "none", border: "none", color: "var(--wr-green)", cursor: "pointer", padding: 0, fontSize: 12 }}>✕</button>
                 </span>
               )}
             </div>
@@ -305,14 +314,14 @@ function ExploreContent() {
         {/* Sort row */}
         {view === "treks" && !dataLoading && (
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <p style={{ color: "#555", fontSize: 13 }}>{filteredTreks.length} results</p>
+            <p style={{ color: "var(--wr-text-faint)", fontSize: 13 }}>{filteredTreks.length} results</p>
             <div style={{ display: "flex", gap: 6 }}>
               {(["rating", "price_asc", "price_desc"] as const).map((s) => (
                 <button key={s} onClick={() => setSortBy(s)} style={{
                   padding: "6px 12px", borderRadius: 8, fontSize: 12, cursor: "pointer",
-                  border: sortBy === s ? "1px solid #1D9E75" : "1px solid #222",
-                  background: sortBy === s ? "#0F2A1E" : "transparent",
-                  color: sortBy === s ? "#1D9E75" : "#555",
+                  border: sortBy === s ? "1px solid var(--wr-green)" : "1px solid var(--wr-border-strong)",
+                  background: sortBy === s ? "var(--wr-green-bg)" : "transparent",
+                  color: sortBy === s ? "var(--wr-green)" : "var(--wr-text-faint)",
                 }}>
                   {s === "rating" ? "Top rated" : s === "price_asc" ? "Price ↑" : "Price ↓"}
                 </button>
@@ -325,7 +334,7 @@ function ExploreContent() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
             <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }`}</style>
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} style={{ background: "#111", borderRadius: 14, height: 280, border: "1px solid #1a1a1a", animation: "pulse 1.5s ease-in-out infinite" }} />
+              <div key={i} style={{ background: "var(--wr-card)", borderRadius: 14, height: 280, border: "1px solid var(--wr-border)", animation: "pulse 1.5s ease-in-out infinite" }} />
             ))}
           </div>
         ) : view === "treks" ? (
@@ -336,9 +345,13 @@ function ExploreContent() {
           ) : (
             <div style={{ textAlign: "center", padding: "80px 0" }}>
               <p style={{ fontSize: 40, marginBottom: 16 }}>🏔️</p>
-              <p style={{ color: "#fff", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>No treks found</p>
-              <p style={{ color: "#555", fontSize: 14 }}>Try adjusting your filters</p>
-              {activeFilterCount > 0 && <button onClick={resetAll} style={{ marginTop: 16, background: "transparent", border: "1px solid #333", color: "#888", padding: "8px 20px", borderRadius: 8, cursor: "pointer", fontSize: 13 }}>Clear filters</button>}
+              <p style={{ color: "var(--wr-text)", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>No treks found</p>
+              <p style={{ color: "var(--wr-text-faint)", fontSize: 14 }}>Try adjusting your filters</p>
+              {activeFilterCount > 0 && (
+                <button onClick={resetAll} style={{ marginTop: 16, background: "transparent", border: "1px solid var(--wr-border-strong)", color: "var(--wr-text-muted)", padding: "8px 20px", borderRadius: 8, cursor: "pointer", fontSize: 13 }}>
+                  Clear filters
+                </button>
+              )}
             </div>
           )
         ) : (
@@ -349,8 +362,8 @@ function ExploreContent() {
           ) : (
             <div style={{ textAlign: "center", padding: "80px 0" }}>
               <p style={{ fontSize: 40, marginBottom: 16 }}>🏕️</p>
-              <p style={{ color: "#fff", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>No agencies found</p>
-              <p style={{ color: "#555", fontSize: 14 }}>Try adjusting your filters</p>
+              <p style={{ color: "var(--wr-text)", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>No agencies found</p>
+              <p style={{ color: "var(--wr-text-faint)", fontSize: 14 }}>Try adjusting your filters</p>
             </div>
           )
         )}
@@ -363,7 +376,7 @@ function ExploreContent() {
 
 export default function ExplorePage() {
   return (
-    <Suspense fallback={<div style={{ background: "#0a0a0a", minHeight: "100vh" }} />}>
+    <Suspense fallback={<div style={{ background: "var(--wr-bg)", minHeight: "100vh" }} />}>
       <ExploreContent />
     </Suspense>
   );
