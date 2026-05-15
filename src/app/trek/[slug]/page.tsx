@@ -19,7 +19,6 @@ export const dynamic = "force-dynamic";
 export default async function TrekPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  // Fetch trek from Supabase
   const { data: trekRow } = await supabase
     .from("agency_treks")
     .select("*")
@@ -28,7 +27,6 @@ export default async function TrekPage({ params }: { params: Promise<{ slug: str
 
   if (!trekRow) return notFound();
 
-  // Fetch the agency that owns this trek (must be verified)
   const { data: agencyRow } = await supabase
     .from("agencies_directory")
     .select("*")
@@ -42,7 +40,7 @@ export default async function TrekPage({ params }: { params: Promise<{ slug: str
   const agency = mapAgency(agencyRow);
 
   return (
-    <main style={{ background: "#0a0a0a", minHeight: "100vh", fontFamily: "sans-serif" }}>
+    <main style={{ background: "var(--wr-bg)", minHeight: "100vh", fontFamily: "sans-serif", transition: "background 0.2s" }}>
       <Navbar />
 
       {/* Hero image */}
@@ -72,7 +70,7 @@ export default async function TrekPage({ params }: { params: Promise<{ slug: str
             )}
           </div>
           <h1 style={{ color: "#fff", fontSize: "clamp(24px, 4vw, 38px)", fontWeight: 800, margin: "0 0 8px", maxWidth: 700 }}>{trek.title}</h1>
-          <p style={{ color: "#aaa", fontSize: 15, margin: 0 }}>📍 {trek.destination}, {trek.state}</p>
+          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 15, margin: 0 }}>📍 {trek.destination}, {trek.state}</p>
         </div>
       </div>
 
@@ -82,7 +80,10 @@ export default async function TrekPage({ params }: { params: Promise<{ slug: str
           {/* Left: main content */}
           <div>
             {/* Quick stats bar */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 1, background: "#1a1a1a", borderRadius: 14, overflow: "hidden", marginBottom: 36 }}>
+            <div style={{
+              display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+              gap: 1, background: "var(--wr-border)", borderRadius: 14, overflow: "hidden", marginBottom: 36,
+            }}>
               {[
                 { label: "Duration", value: trek.duration },
                 { label: "Price", value: `₹${trek.price.toLocaleString("en-IN")}` },
@@ -90,58 +91,61 @@ export default async function TrekPage({ params }: { params: Promise<{ slug: str
                 { label: "Min age", value: `${trek.minAge}+` },
                 { label: "Best season", value: trek.bestSeason },
               ].map((s) => (
-                <div key={s.label} style={{ background: "#111", padding: "16px 20px", textAlign: "center" }}>
-                  <p style={{ color: "#555", fontSize: 11, margin: "0 0 5px" }}>{s.label}</p>
-                  <p style={{ color: "#1D9E75", fontSize: 14, fontWeight: 700, margin: 0 }}>{s.value}</p>
+                <div key={s.label} style={{ background: "var(--wr-card)", padding: "16px 20px", textAlign: "center" }}>
+                  <p style={{ color: "var(--wr-text-faint)", fontSize: 11, margin: "0 0 5px" }}>{s.label}</p>
+                  <p style={{ color: "var(--wr-green)", fontSize: 14, fontWeight: 700, margin: 0 }}>{s.value}</p>
                 </div>
               ))}
             </div>
 
             {/* About */}
             <div style={{ marginBottom: 36 }}>
-              <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 700, marginBottom: 14 }}>About this trek</h2>
-              <p style={{ color: "#888", fontSize: 14, lineHeight: 1.9 }}>{trek.description}</p>
+              <h2 style={{ color: "var(--wr-text)", fontSize: 18, fontWeight: 700, marginBottom: 14 }}>About this trek</h2>
+              <p style={{ color: "var(--wr-text-muted)", fontSize: 14, lineHeight: 1.9 }}>{trek.description}</p>
             </div>
 
             {/* Highlights */}
             <div style={{ marginBottom: 36 }}>
-              <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Highlights</h2>
+              <h2 style={{ color: "var(--wr-text)", fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Highlights</h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
                 {trek.highlights.map((h) => (
-                  <div key={h} style={{ background: "#0F2A1E", border: "1px solid #1D9E7533", borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ color: "#1D9E75", fontSize: 14 }}>✓</span>
-                    <span style={{ color: "#ccc", fontSize: 13 }}>{h}</span>
+                  <div key={h} style={{
+                    background: "var(--wr-green-bg)", border: "1px solid var(--wr-green-border)",
+                    borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10,
+                  }}>
+                    <span style={{ color: "var(--wr-green)", fontSize: 14 }}>✓</span>
+                    <span style={{ color: "var(--wr-text-2)", fontSize: 13 }}>{h}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* What's included */}
+            {/* Included */}
             <div style={{ marginBottom: 36 }}>
-              <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 700, marginBottom: 16 }}>What&apos;s included</h2>
+              <h2 style={{ color: "var(--wr-text)", fontSize: 18, fontWeight: 700, marginBottom: 16 }}>What&apos;s included</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {trek.includes.map((item) => (
-                  <div key={item} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px solid #111" }}>
-                    <span style={{ color: "#1D9E75", fontSize: 16 }}>✓</span>
-                    <span style={{ color: "#888", fontSize: 14 }}>{item}</span>
+                  <div key={item} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px solid var(--wr-border)" }}>
+                    <span style={{ color: "var(--wr-green)", fontSize: 16 }}>✓</span>
+                    <span style={{ color: "var(--wr-text-muted)", fontSize: 14 }}>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Rating */}
-            <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 14, padding: "20px 24px", display: "flex", alignItems: "center", gap: 20 }}>
+            <div style={{ background: "var(--wr-card)", border: "1px solid var(--wr-border)", borderRadius: 14, padding: "20px 24px", display: "flex", alignItems: "center", gap: 20 }}>
               <div style={{ textAlign: "center" }}>
                 <p style={{ color: "#F59E0B", fontSize: 36, fontWeight: 800, margin: 0 }}>{trek.rating}</p>
-                <p style={{ color: "#555", fontSize: 12, margin: "4px 0 0" }}>out of 5</p>
+                <p style={{ color: "var(--wr-text-faint)", fontSize: 12, margin: "4px 0 0" }}>out of 5</p>
               </div>
               <div>
                 <div style={{ display: "flex", gap: 2, marginBottom: 4 }}>
                   {[1,2,3,4,5].map((s) => (
-                    <span key={s} style={{ color: s <= Math.round(trek.rating) ? "#F59E0B" : "#333", fontSize: 18 }}>★</span>
+                    <span key={s} style={{ color: s <= Math.round(trek.rating) ? "#F59E0B" : "var(--wr-border-strong)", fontSize: 18 }}>★</span>
                   ))}
                 </div>
-                <p style={{ color: "#555", fontSize: 13, margin: 0 }}>Based on {trek.reviewCount} reviews</p>
+                <p style={{ color: "var(--wr-text-faint)", fontSize: 13, margin: 0 }}>Based on {trek.reviewCount} reviews</p>
               </div>
             </div>
           </div>
@@ -149,56 +153,56 @@ export default async function TrekPage({ params }: { params: Promise<{ slug: str
           {/* Right: sticky sidebar */}
           <div style={{ position: "sticky", top: 84 }}>
             {/* Price card */}
-            <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 16, padding: 24, marginBottom: 16 }}>
+            <div style={{ background: "var(--wr-card)", border: "1px solid var(--wr-border)", borderRadius: 16, padding: 24, marginBottom: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                 <div>
-                  <span style={{ color: "#555", fontSize: 12 }}>Starting from</span>
-                  <p style={{ color: "#fff", fontSize: 28, fontWeight: 800, margin: "4px 0 0" }}>
+                  <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>Starting from</span>
+                  <p style={{ color: "var(--wr-text)", fontSize: 28, fontWeight: 800, margin: "4px 0 0" }}>
                     ₹{trek.price.toLocaleString("en-IN")}
                   </p>
-                  <span style={{ color: "#555", fontSize: 12 }}>per person</span>
+                  <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>per person</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   <span style={{ color: "#F59E0B" }}>★</span>
-                  <span style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>{trek.rating}</span>
-                  <span style={{ color: "#555", fontSize: 12 }}>({trek.reviewCount})</span>
+                  <span style={{ color: "var(--wr-text)", fontSize: 14, fontWeight: 600 }}>{trek.rating}</span>
+                  <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>({trek.reviewCount})</span>
                 </div>
               </div>
 
               {agency && (
                 <Link href={`/agency/${agency.slug}`} style={{
                   display: "flex", alignItems: "center", gap: 10,
-                  padding: "12px 14px", background: "#1D9E75", borderRadius: 10,
+                  padding: "12px 14px", background: "var(--wr-green)", borderRadius: 10,
                   textDecoration: "none", marginBottom: 10,
                 }}>
                   <span style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>Book with {agency.name} →</span>
                 </Link>
               )}
 
-              <p style={{ color: "#444", fontSize: 11, textAlign: "center", marginTop: 8 }}>
+              <p style={{ color: "var(--wr-text-faint)", fontSize: 11, textAlign: "center", marginTop: 8 }}>
                 Free cancellation · Secure payment
               </p>
             </div>
 
             {/* Agency card */}
             {agency && (
-              <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 16, padding: 20, marginBottom: 16 }}>
-                <p style={{ color: "#888", fontSize: 11, marginBottom: 12 }}>OPERATED BY</p>
+              <div style={{ background: "var(--wr-card)", border: "1px solid var(--wr-border)", borderRadius: 16, padding: 20, marginBottom: 16 }}>
+                <p style={{ color: "var(--wr-text-faint)", fontSize: 11, marginBottom: 12 }}>OPERATED BY</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: "#1D9E75", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 16 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--wr-green)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 16 }}>
                     {agency.name.charAt(0)}
                   </div>
                   <div>
-                    <p style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: 0 }}>{agency.name}</p>
-                    <p style={{ color: "#555", fontSize: 12, margin: 0 }}>📍 {agency.location}</p>
+                    <p style={{ color: "var(--wr-text)", fontSize: 14, fontWeight: 600, margin: 0 }}>{agency.name}</p>
+                    <p style={{ color: "var(--wr-text-faint)", fontSize: 12, margin: 0 }}>📍 {agency.location}</p>
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 16, marginBottom: 14 }}>
-                  <div><p style={{ color: "#555", fontSize: 11, margin: "0 0 2px" }}>Rating</p><p style={{ color: "#F59E0B", fontSize: 14, fontWeight: 700, margin: 0 }}>{agency.rating} ★</p></div>
-                  <div><p style={{ color: "#555", fontSize: 11, margin: "0 0 2px" }}>Reviews</p><p style={{ color: "#fff", fontSize: 14, fontWeight: 700, margin: 0 }}>{agency.reviewCount}</p></div>
-                  {agency.verified && <div><p style={{ color: "#555", fontSize: 11, margin: "0 0 2px" }}>Status</p><p style={{ color: "#1D9E75", fontSize: 13, fontWeight: 600, margin: 0 }}>✓ Verified</p></div>}
+                  <div><p style={{ color: "var(--wr-text-faint)", fontSize: 11, margin: "0 0 2px" }}>Rating</p><p style={{ color: "#F59E0B", fontSize: 14, fontWeight: 700, margin: 0 }}>{agency.rating} ★</p></div>
+                  <div><p style={{ color: "var(--wr-text-faint)", fontSize: 11, margin: "0 0 2px" }}>Reviews</p><p style={{ color: "var(--wr-text)", fontSize: 14, fontWeight: 700, margin: 0 }}>{agency.reviewCount}</p></div>
+                  {agency.verified && <div><p style={{ color: "var(--wr-text-faint)", fontSize: 11, margin: "0 0 2px" }}>Status</p><p style={{ color: "var(--wr-green)", fontSize: 13, fontWeight: 600, margin: 0 }}>✓ Verified</p></div>}
                 </div>
-                <Link href={`/agency/${agency.slug}`} style={{ display: "block", textAlign: "center", color: "#1D9E75", fontSize: 13, textDecoration: "none" }}>
+                <Link href={`/agency/${agency.slug}`} style={{ display: "block", textAlign: "center", color: "var(--wr-green)", fontSize: 13, textDecoration: "none" }}>
                   View agency profile →
                 </Link>
               </div>

@@ -23,7 +23,7 @@ const steps = [
     title: "Fill agency details",
     time: "5–10 minutes",
     desc: "Tell us about your agency — location, activities offered, PAN number, and a brief description. This is your public profile.",
-    details: ["Agency name, location & state", "Activities you offer (trekking, rafting, etc.)", "PAN number for verification", "Contact details"],
+    details: ["Agency name, location & state", "Activities you offer", "PAN number for verification", "Contact details"],
   },
   {
     num: "03",
@@ -39,15 +39,15 @@ const steps = [
     title: "We review your listing",
     time: "24–48 hours",
     desc: "Our team verifies your details — GST, permits, and agency authenticity. We check every listing before it goes live.",
-    details: ["Manual review by WildRoute team", "Document verification", "Quality check on listing content", "You'll get an email on approval"],
+    details: ["Manual review by WildRoute team", "Document verification", "Quality check on content", "Email on approval"],
   },
   {
     num: "05",
     icon: "🚀",
     title: "Go live & get discovered",
     time: "Instantly after approval",
-    desc: "Once approved, your agency and all your listings are live on gowildroute.com. Trekkers can discover you, send enquiries, and book.",
-    details: ["Appear on /explore page", "Dedicated agency profile page", "Each trek gets its own listing page", "Enquiries directly to your email"],
+    desc: "Once approved, your agency and all your listings are live on gowildroute.com. Trekkers can discover you and send enquiries.",
+    details: ["Appear on /explore page", "Dedicated agency profile page", "Each trek gets its own page", "Enquiries to your email"],
   },
 ];
 
@@ -70,35 +70,17 @@ const benefits = [
 ];
 
 const faqs = [
-  {
-    q: "Is it really free?",
-    a: "Yes. Listing is completely free for the first 6 months after your agency goes live. After that, we move to a small commission model — we only earn when you earn.",
-  },
-  {
-    q: "How long does verification take?",
-    a: "Usually 24–48 hours on working days. Our team manually reviews every agency before approving.",
-  },
-  {
-    q: "Can I list multiple treks?",
-    a: "Absolutely. After your first listing is approved, you can add more activities any time by clicking 'Add Another Activity' — no need to re-fill your agency details.",
-  },
-  {
-    q: "What if my listing is rejected?",
-    a: "We'll email you with the specific reason and what needs to be fixed. You can resubmit after making corrections.",
-  },
-  {
-    q: "Do trekkers pay through WildRoute?",
-    a: "Currently, enquiries go directly to your email and you handle the booking. Payment gateway integration is on our roadmap.",
-  },
-  {
-    q: "Can I edit my listing after it goes live?",
-    a: "Edits through the dashboard are coming soon. For urgent changes right now, email us at support@gowildroute.com.",
-  },
+  { q: "Is it really free?", a: "Yes. Listing is completely free for the first 6 months after your agency goes live. After that, we move to a small commission model — we only earn when you earn." },
+  { q: "How long does verification take?", a: "Usually 24–48 hours on working days. Our team manually reviews every agency before approving." },
+  { q: "Can I list multiple treks?", a: "Absolutely. After your first listing is approved, you can add more activities any time by clicking 'Add Another Activity' — no need to re-fill your agency details." },
+  { q: "What if my listing is rejected?", a: "We'll email you with the specific reason and what needs to be fixed. You can resubmit after making corrections." },
+  { q: "Do trekkers pay through WildRoute?", a: "Currently, enquiries go directly to your email and you handle the booking. Payment gateway integration is on our roadmap." },
+  { q: "Can I edit my listing after it goes live?", a: "Edits through the dashboard are coming soon. For urgent changes right now, email us at support@gowildroute.com." },
 ];
 
 export default function ListYourAgencyPage() {
   return (
-    <main style={{ background: "#0a0a0a", minHeight: "100vh", fontFamily: "sans-serif" }}>
+    <main style={{ background: "var(--wr-bg)", minHeight: "100vh", fontFamily: "sans-serif", transition: "background 0.2s" }}>
       <Navbar />
 
       {/* ── HERO ── */}
@@ -148,7 +130,7 @@ export default function ListYourAgencyPage() {
       </section>
 
       {/* ── QUICK STATS ── */}
-      <div style={{ background: "#0d0d0d", borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}>
+      <div style={{ background: "var(--wr-bg-alt)", borderTop: "1px solid var(--wr-border)", borderBottom: "1px solid var(--wr-border)", transition: "background 0.2s" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 24px", display: "flex", justifyContent: "center", gap: 48, flexWrap: "wrap" }}>
           {[
             { num: "Free", label: "First 6 months" },
@@ -157,8 +139,8 @@ export default function ListYourAgencyPage() {
             { num: "247+", label: "Trekkers waiting" },
           ].map(s => (
             <div key={s.label} style={{ textAlign: "center" }}>
-              <div style={{ color: "#1D9E75", fontSize: 28, fontWeight: 800 }}>{s.num}</div>
-              <div style={{ color: "#555", fontSize: 12, marginTop: 4 }}>{s.label}</div>
+              <div style={{ color: "var(--wr-green)", fontSize: 28, fontWeight: 800 }}>{s.num}</div>
+              <div style={{ color: "var(--wr-text-faint)", fontSize: 12, marginTop: 4 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -168,9 +150,9 @@ export default function ListYourAgencyPage() {
       <section id="process" style={{ padding: "80px 24px" }}>
         <div style={{ maxWidth: 860, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 60 }}>
-            <p style={{ color: "#1D9E75", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", marginBottom: 12 }}>THE LISTING PROCESS</p>
-            <h2 style={{ color: "#fff", fontSize: 32, fontWeight: 800, marginBottom: 12 }}>From sign-up to live listing</h2>
-            <p style={{ color: "#555", fontSize: 15 }}>Simple, transparent, and fully guided.</p>
+            <p style={{ color: "var(--wr-green)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", marginBottom: 12 }}>THE LISTING PROCESS</p>
+            <h2 style={{ color: "var(--wr-text)", fontSize: 32, fontWeight: 800, marginBottom: 12 }}>From sign-up to live listing</h2>
+            <p style={{ color: "var(--wr-text-faint)", fontSize: 15 }}>Simple, transparent, and fully guided.</p>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
@@ -180,31 +162,31 @@ export default function ListYourAgencyPage() {
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 60, flexShrink: 0 }}>
                   <div style={{
                     width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                    background: "#0F2A1E", border: "2px solid #1D9E75",
+                    background: "var(--wr-green-bg)", border: "2px solid var(--wr-green)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 18,
                   }}>
                     {step.icon}
                   </div>
                   {i < steps.length - 1 && (
-                    <div style={{ width: 2, flex: 1, background: "linear-gradient(to bottom, #1D9E75, #1a1a1a)", margin: "4px 0", minHeight: 40 }} />
+                    <div style={{ width: 2, flex: 1, background: "linear-gradient(to bottom, var(--wr-green), var(--wr-border))", margin: "4px 0", minHeight: 40 }} />
                   )}
                 </div>
 
                 {/* Content */}
                 <div style={{ paddingLeft: 24, paddingBottom: i < steps.length - 1 ? 48 : 0, flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-                    <span style={{ color: "#1D9E75", fontSize: 11, fontWeight: 700 }}>{step.num}</span>
-                    <h3 style={{ color: "#fff", fontSize: 18, fontWeight: 700, margin: 0 }}>{step.title}</h3>
-                    <span style={{ background: "#111", border: "1px solid #222", color: "#555", fontSize: 11, padding: "3px 10px", borderRadius: 20 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8, flexWrap: "wrap" }}>
+                    <span style={{ color: "var(--wr-green)", fontSize: 11, fontWeight: 700 }}>{step.num}</span>
+                    <h3 style={{ color: "var(--wr-text)", fontSize: 18, fontWeight: 700, margin: 0 }}>{step.title}</h3>
+                    <span style={{ background: "var(--wr-card)", border: "1px solid var(--wr-border)", color: "var(--wr-text-faint)", fontSize: 11, padding: "3px 10px", borderRadius: 20 }}>
                       ⏱ {step.time}
                     </span>
                   </div>
-                  <p style={{ color: "#888", fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>{step.desc}</p>
+                  <p style={{ color: "var(--wr-text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>{step.desc}</p>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {step.details.map(d => (
-                      <span key={d} style={{ background: "#111", border: "1px solid #1a1a1a", color: "#666", fontSize: 12, padding: "4px 12px", borderRadius: 20, display: "flex", alignItems: "center", gap: 6 }}>
-                        <span style={{ color: "#1D9E75", fontSize: 10 }}>✓</span> {d}
+                      <span key={d} style={{ background: "var(--wr-card)", border: "1px solid var(--wr-border)", color: "var(--wr-text-muted)", fontSize: 12, padding: "4px 12px", borderRadius: 20, display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ color: "var(--wr-green)", fontSize: 10 }}>✓</span> {d}
                       </span>
                     ))}
                   </div>
@@ -215,7 +197,7 @@ export default function ListYourAgencyPage() {
 
           <div style={{ textAlign: "center", marginTop: 56 }}>
             <Link href="/register/agency" style={{
-              background: "#1D9E75", color: "#fff", padding: "16px 40px",
+              background: "var(--wr-green)", color: "#fff", padding: "16px 40px",
               borderRadius: 10, fontSize: 15, fontWeight: 700, textDecoration: "none",
               display: "inline-block", boxShadow: "0 4px 24px rgba(29,158,117,0.35)",
             }}>
@@ -226,19 +208,19 @@ export default function ListYourAgencyPage() {
       </section>
 
       {/* ── WHAT YOU NEED ── */}
-      <section style={{ padding: "72px 24px", background: "#0d0d0d", borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}>
+      <section style={{ padding: "72px 24px", background: "var(--wr-bg-alt)", borderTop: "1px solid var(--wr-border)", borderBottom: "1px solid var(--wr-border)", transition: "background 0.2s" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <p style={{ color: "#1D9E75", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", marginBottom: 12 }}>REQUIREMENTS</p>
-            <h2 style={{ color: "#fff", fontSize: 28, fontWeight: 800 }}>What you&apos;ll need to list</h2>
+            <p style={{ color: "var(--wr-green)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", marginBottom: 12 }}>REQUIREMENTS</p>
+            <h2 style={{ color: "var(--wr-text)", fontSize: 28, fontWeight: 800 }}>What you&apos;ll need to list</h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
             {requirements.map(r => (
-              <div key={r.title} style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 14, padding: 20, display: "flex", gap: 14 }}>
+              <div key={r.title} style={{ background: "var(--wr-card)", border: "1px solid var(--wr-border)", borderRadius: 14, padding: 20, display: "flex", gap: 14, transition: "background 0.2s" }}>
                 <div style={{ fontSize: 24, flexShrink: 0 }}>{r.icon}</div>
                 <div>
-                  <p style={{ color: "#fff", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{r.title}</p>
-                  <p style={{ color: "#555", fontSize: 13, lineHeight: 1.6 }}>{r.desc}</p>
+                  <p style={{ color: "var(--wr-text)", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{r.title}</p>
+                  <p style={{ color: "var(--wr-text-faint)", fontSize: 13, lineHeight: 1.6 }}>{r.desc}</p>
                 </div>
               </div>
             ))}
@@ -250,15 +232,15 @@ export default function ListYourAgencyPage() {
       <section style={{ padding: "72px 24px" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <p style={{ color: "#1D9E75", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", marginBottom: 12 }}>WHY WILDROUTE</p>
-            <h2 style={{ color: "#fff", fontSize: 28, fontWeight: 800 }}>What you get when you list</h2>
+            <p style={{ color: "var(--wr-green)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", marginBottom: 12 }}>WHY WILDROUTE</p>
+            <h2 style={{ color: "var(--wr-text)", fontSize: 28, fontWeight: 800 }}>What you get when you list</h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
             {benefits.map(b => (
-              <div key={b.title} style={{ background: "#0F2A1E", border: "1px solid #1D9E7522", borderRadius: 14, padding: 22 }}>
+              <div key={b.title} style={{ background: "var(--wr-green-bg)", border: "1px solid var(--wr-green-border)", borderRadius: 14, padding: 22 }}>
                 <div style={{ fontSize: 26, marginBottom: 12 }}>{b.icon}</div>
-                <p style={{ color: "#fff", fontSize: 14, fontWeight: 600, marginBottom: 6 }}>{b.title}</p>
-                <p style={{ color: "#5DCAA5", fontSize: 13, lineHeight: 1.6 }}>{b.desc}</p>
+                <p style={{ color: "var(--wr-text)", fontSize: 14, fontWeight: 600, marginBottom: 6 }}>{b.title}</p>
+                <p style={{ color: "var(--wr-green)", fontSize: 13, lineHeight: 1.6 }}>{b.desc}</p>
               </div>
             ))}
           </div>
@@ -266,17 +248,17 @@ export default function ListYourAgencyPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section style={{ padding: "72px 24px", background: "#0d0d0d", borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}>
+      <section style={{ padding: "72px 24px", background: "var(--wr-bg-alt)", borderTop: "1px solid var(--wr-border)", borderBottom: "1px solid var(--wr-border)", transition: "background 0.2s" }}>
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <p style={{ color: "#1D9E75", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", marginBottom: 12 }}>FAQ</p>
-            <h2 style={{ color: "#fff", fontSize: 28, fontWeight: 800 }}>Common questions</h2>
+            <p style={{ color: "var(--wr-green)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", marginBottom: 12 }}>FAQ</p>
+            <h2 style={{ color: "var(--wr-text)", fontSize: 28, fontWeight: 800 }}>Common questions</h2>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {faqs.map(f => (
-              <div key={f.q} style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 12, padding: "20px 24px" }}>
-                <p style={{ color: "#fff", fontSize: 14, fontWeight: 600, marginBottom: 8 }}>{f.q}</p>
-                <p style={{ color: "#666", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{f.a}</p>
+              <div key={f.q} style={{ background: "var(--wr-card)", border: "1px solid var(--wr-border)", borderRadius: 12, padding: "20px 24px", transition: "background 0.2s" }}>
+                <p style={{ color: "var(--wr-text)", fontSize: 14, fontWeight: 600, marginBottom: 8 }}>{f.q}</p>
+                <p style={{ color: "var(--wr-text-muted)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{f.a}</p>
               </div>
             ))}
           </div>
@@ -286,21 +268,21 @@ export default function ListYourAgencyPage() {
       {/* ── FINAL CTA ── */}
       <section style={{ padding: "80px 24px", textAlign: "center" }}>
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
-          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#0F2A1E", border: "2px solid #1D9E75", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: 24 }}>
+          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--wr-green-bg)", border: "2px solid var(--wr-green)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: 24 }}>
             🏔️
           </div>
-          <h2 style={{ color: "#fff", fontSize: 30, fontWeight: 800, marginBottom: 12 }}>Ready to grow your bookings?</h2>
-          <p style={{ color: "#666", fontSize: 15, marginBottom: 36, lineHeight: 1.7 }}>
+          <h2 style={{ color: "var(--wr-text)", fontSize: 30, fontWeight: 800, marginBottom: 12 }}>Ready to grow your bookings?</h2>
+          <p style={{ color: "var(--wr-text-muted)", fontSize: 15, marginBottom: 36, lineHeight: 1.7 }}>
             Join WildRoute and get discovered by thousands of trekkers actively searching for your experiences. Free to start, no risk.
           </p>
           <Link href="/register/agency" style={{
-            background: "#1D9E75", color: "#fff", padding: "16px 44px",
+            background: "var(--wr-green)", color: "#fff", padding: "16px 44px",
             borderRadius: 10, fontSize: 16, fontWeight: 700, textDecoration: "none",
             display: "inline-block", boxShadow: "0 4px 32px rgba(29,158,117,0.4)",
           }}>
             List my agency for free →
           </Link>
-          <p style={{ color: "#333", fontSize: 12, marginTop: 14 }}>
+          <p style={{ color: "var(--wr-text-faint)", fontSize: 12, marginTop: 14 }}>
             No credit card · No commission for 6 months · Cancel anytime
           </p>
         </div>

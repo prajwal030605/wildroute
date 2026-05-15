@@ -27,16 +27,18 @@ export default function TrekCard({ trek }: { trek: Trek }) {
   return (
     <Link href={`/trek/${trek.slug}`} style={{ textDecoration: "none" }}>
       <div style={{
-        background: "#111", border: "1px solid #1a1a1a", borderRadius: 16, overflow: "hidden",
-        transition: "border-color 0.2s, transform 0.2s",
+        background: "var(--wr-card)",
+        border: "1px solid var(--wr-border)",
+        borderRadius: 16, overflow: "hidden",
+        transition: "border-color 0.2s, transform 0.2s, background 0.2s",
         cursor: "pointer",
       }}
         onMouseEnter={e => {
-          (e.currentTarget as HTMLDivElement).style.borderColor = "#1D9E75";
+          (e.currentTarget as HTMLDivElement).style.borderColor = "var(--wr-green)";
           (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
         }}
         onMouseLeave={e => {
-          (e.currentTarget as HTMLDivElement).style.borderColor = "#1a1a1a";
+          (e.currentTarget as HTMLDivElement).style.borderColor = "var(--wr-border)";
           (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
         }}
       >
@@ -67,18 +69,15 @@ export default function TrekCard({ trek }: { trek: Trek }) {
             {trek.difficulty}
           </span>
           {/* Duration on image */}
-          <span style={{
-            position: "absolute", bottom: 10, left: 12,
-            color: "#ddd", fontSize: 12,
-          }}>
+          <span style={{ position: "absolute", bottom: 10, left: 12, color: "#ddd", fontSize: 12 }}>
             {trek.duration}
           </span>
         </div>
 
         {/* Content */}
         <div style={{ padding: "16px" }}>
-          <h3 style={{ color: "#fff", fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{trek.title}</h3>
-          <p style={{ color: "#666", fontSize: 12, marginBottom: 12 }}>
+          <h3 style={{ color: "var(--wr-text)", fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{trek.title}</h3>
+          <p style={{ color: "var(--wr-text-muted)", fontSize: 12, marginBottom: 12 }}>
             📍 {trek.destination}, {trek.state}
           </p>
 
@@ -86,8 +85,9 @@ export default function TrekCard({ trek }: { trek: Trek }) {
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
             {trek.highlights.slice(0, 2).map((h) => (
               <span key={h} style={{
-                background: "#0F2A1E", color: "#1D9E75", fontSize: 11,
-                padding: "3px 8px", borderRadius: 6,
+                background: "var(--wr-green-bg)",
+                color: "var(--wr-green)",
+                fontSize: 11, padding: "3px 8px", borderRadius: 6,
               }}>
                 {h}
               </span>
@@ -97,24 +97,31 @@ export default function TrekCard({ trek }: { trek: Trek }) {
           {/* Footer row */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <span style={{ color: "#fff", fontSize: 17, fontWeight: 700 }}>₹{trek.price.toLocaleString("en-IN")}</span>
-              <span style={{ color: "#555", fontSize: 12 }}> /person</span>
+              <span style={{ color: "var(--wr-text)", fontSize: 17, fontWeight: 700 }}>₹{trek.price.toLocaleString("en-IN")}</span>
+              <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}> /person</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <span style={{ color: "#F59E0B", fontSize: 13 }}>★</span>
-              <span style={{ color: "#fff", fontSize: 13, fontWeight: 500 }}>{trek.rating}</span>
-              <span style={{ color: "#555", fontSize: 12 }}>({trek.reviewCount})</span>
+              <span style={{ color: "var(--wr-text)", fontSize: 13, fontWeight: 500 }}>{trek.rating}</span>
+              <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>({trek.reviewCount})</span>
             </div>
           </div>
 
           {/* Agency */}
           {agency && (
-            <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #1a1a1a", display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#1D9E75", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{
+              marginTop: 12, paddingTop: 12,
+              borderTop: "1px solid var(--wr-border)",
+              display: "flex", alignItems: "center", gap: 8,
+            }}>
+              <div style={{
+                width: 20, height: 20, borderRadius: "50%", background: "var(--wr-green)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
                 <span style={{ color: "#fff", fontSize: 9, fontWeight: 700 }}>W</span>
               </div>
-              <span style={{ color: "#555", fontSize: 12 }}>{agency.name}</span>
-              {agency.verified && <span style={{ color: "#1D9E75", fontSize: 10 }}>✓ Verified</span>}
+              <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>{agency.name}</span>
+              {agency.verified && <span style={{ color: "var(--wr-green)", fontSize: 10 }}>✓ Verified</span>}
             </div>
           )}
         </div>
