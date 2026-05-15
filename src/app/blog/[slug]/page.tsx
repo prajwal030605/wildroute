@@ -5,6 +5,37 @@ import Footer from "@/components/layout/Footer";
 import { blogPosts } from "@/data/blogs";
 import { notFound } from "next/navigation";
 
+import type { Metadata } from "next";
+
+const BASE_URL = "https://gowildroute.com";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const post = blogPosts.find((p) => p.slug === slug);
+  if (!post) return {};
+  const url = `${BASE_URL}/blog/${post.slug}`;
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      url,
+      title: post.title,
+      description: post.excerpt,
+      images: [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [post.coverImage],
+    },
+  };
+}
+
 export async function generateStaticParams() {
   return blogPosts.map((post) => ({ slug: post.slug }));
 }
@@ -48,6 +79,8 @@ function renderContent(content: string) {
             <img
               src={url}
               alt={caption}
+              loading="lazy"
+              decoding="async"
               style={{ width: "100%", borderRadius: 14, display: "block", objectFit: "cover", maxHeight: 420 }}
             />
             {caption && (
@@ -121,7 +154,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {/* Hero — keep dark overlays since there's a photo underneath */}
         <div style={{ position: "relative", height: 420, overflow: "hidden" }}>
-          <img src={post.coverImage} alt={post.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img src={post.coverImage} alt={post.title} fetchPriority="high" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(10,10,10,0.95) 100%)" }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "0 24px 48px" }}>
             <div style={{ maxWidth: 820, margin: "0 auto" }}>
@@ -202,7 +235,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 {related.map((r) => (
                   <Link key={r.slug} href={`/blog/${r.slug}`} style={{ textDecoration: "none" }}>
                     <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                      <img src={r.coverImage} alt={r.title} style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 8, flexShrink: 0 }} />
+                      <img src={r.coverImage} alt={r.title} loading="lazy" decoding="async" style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 8, flexShrink: 0 }} />
                       <div>
                         <p style={{ color: "var(--wr-text-2)", fontSize: 13, fontWeight: 600, margin: "0 0 4px", lineHeight: 1.4 }}>{r.title}</p>
                         <p style={{ color: "var(--wr-text-faint)", fontSize: 12, margin: 0 }}>{r.readTime}</p>

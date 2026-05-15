@@ -1,11 +1,10 @@
 import type { MetadataRoute } from "next";
-import { treks } from "@/data/treks";
-import { agencies } from "@/data/agencies";
 import { blogPosts } from "@/data/blogs";
+import { supabase } from "@/lib/supabase";
 
 const BASE_URL = "https://gowildroute.com";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -27,6 +26,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${BASE_URL}/list-your-agency`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${BASE_URL}/register`,
       lastModified: new Date(),
       changeFrequency: "monthly",
@@ -40,23 +45,48 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // Trek pages
-  const trekPages: MetadataRoute.Sitemap = treks.map((trek) => ({
-    url: `${BASE_URL}/trek/${trek.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
+  // Trek pages — fetch live slugs from Supabase
+  let trekPages: MetadataRoute.Sitemap = [];
+  try {
+    const { data: trekRows } = await supabase
+      .from("agency_treks")
+      .select("trek_slug, updated_at")
+      .not("trek_slug", "is", null);
 
-  // Agency pages
-  const agencyPages: MetadataRoute.Sitemap = agencies.map((agency) => ({
-    url: `${BASE_URL}/agency/${agency.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
+    if (trekRows) {
+      trekPages = trekRows.map((row) => ({
+        url: `${BASE_URL}/trek/${row.trek_slug}`,
+        lastModified: row.updated_at ? new Date(row.updated_at) : new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      }));
+    }
+  } catch {
+    // Fallback: no trek pages if Supabase is unreachable
+  }
 
-  // Blog post pages
+  // Agency pages — fetch live slugs from Supabase
+  let agencyPages: MetadataRoute.Sitemap = [];
+  try {
+    const { data: agencyRows } = await supabase
+      .from("agencies_directory")
+      .select("slug, updated_at")
+      .eq("verified", true)
+      .not("slug", "is", null);
+
+    if (agencyRows) {
+      agencyPages = agencyRows.map((row) => ({
+        url: `${BASE_URL}/agency/${row.slug}`,
+        lastModified: row.updated_at ? new Date(row.updated_at) : new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }));
+    }
+  } catch {
+    // Fallback: no agency pages if Supabase is unreachable
+  }
+
+  // Blog post pages — static data
   const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${BASE_URL}/blog/${post.slug}`,
     lastModified: new Date(),

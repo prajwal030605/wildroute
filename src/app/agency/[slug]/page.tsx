@@ -12,6 +12,46 @@ const activityEmoji: Record<string, string> = {
   camping: "⛺", cycling: "🚵", skiing: "⛷️", "rock-climbing": "🧗",
 };
 
+import type { Metadata } from "next";
+
+const BASE_URL = "https://gowildroute.com";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const { data: row } = await supabase
+    .from("agencies_directory")
+    .select("agency_name, agency_description, cover_image, location, state_name")
+    .eq("slug", slug)
+    .eq("verified", true)
+    .maybeSingle();
+
+  if (!row) return {};
+  const title = `${row.agency_name} — Adventure Agency | WildRoute`;
+  const description = row.agency_description?.slice(0, 155) || `Book verified treks and adventures with ${row.agency_name} in ${row.location}, ${row.state_name} on WildRoute.`;
+  const image = row.cover_image || `${BASE_URL}/og-image.png`;
+  const url = `${BASE_URL}/agency/${slug}`;
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      url,
+      title,
+      description,
+      images: [{ url: image, width: 1200, height: 630, alt: row.agency_name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function AgencyPage({ params }: { params: Promise<{ slug: string }> }) {
