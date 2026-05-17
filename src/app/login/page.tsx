@@ -183,11 +183,14 @@ export default function LoginPage() {
               Log in
             </button>
           </form>
-          <p style={{ textAlign: "center", marginTop: 22 }}>
+          <div style={{ textAlign: "center", marginTop: 22, display: "flex", flexDirection: "column", gap: 10 }}>
+            <Link href="/forgot-password" style={{ color: "#1D9E75", fontSize: 13, textDecoration: "none" }}>
+              Forgot your password?
+            </Link>
             <Link href="/" style={{ color: "#444", fontSize: 12, textDecoration: "none" }}>
               ← Back to site
             </Link>
-          </p>
+          </div>
         </div>
       </section>
       <Footer />
