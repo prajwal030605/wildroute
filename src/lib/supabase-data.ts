@@ -11,10 +11,10 @@ export function mapAgency(row: AnyRow): Agency {
   return {
     id: String(row.registration_id || row.id || ""),
     slug: String(row.slug || ""),
-    name: String(row.name || ""),
+    name: String(row.agency_name || row.name || ""),
     location: String(row.location || ""),
-    state: String(row.state || ""),
-    description: String(row.description || ""),
+    state: String(row.state_name || row.state || ""),
+    description: String(row.agency_description || row.description || ""),
     logo: String(row.logo || "/WildRoute_PFP_Tilted.png"),
     coverImage: String(row.cover_image || ""),
     rating: Number(row.rating) || 4.5,
@@ -45,6 +45,7 @@ export function mapTrek(trekRow: AnyRow, agencyRow?: AnyRow | null): Trek {
   return {
     id: String(trekRow.registration_id || ""),
     agencyId: String(agencyRow?.registration_id || agencyRow?.id || ""),
+    agencyName: agencyRow ? String(agencyRow.agency_name || agencyRow.name || "") : undefined,
     title: String(trekRow.trek_name || ""),
     slug: String(trekRow.trek_slug || ""),
     destination: String(trekRow.trek_area || agencyRow?.location || "India"),

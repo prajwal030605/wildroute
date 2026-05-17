@@ -32,6 +32,7 @@ export interface Agency {
 export interface Trek {
   id: string;
   agencyId: string;
+  agencyName?: string;
   title: string;
   slug: string;
   destination: string;

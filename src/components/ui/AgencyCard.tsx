@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { Agency } from "@/types";
-import { treks } from "@/data/treks";
 
 const activityEmoji: Record<string, string> = {
   trekking: "🥾",
@@ -15,10 +14,6 @@ const activityEmoji: Record<string, string> = {
 };
 
 export default function AgencyCard({ agency }: { agency: Agency }) {
-  const agencyTreks = treks.filter((t) => t.agencyId === agency.id);
-  const startingPrice = agencyTreks.length > 0
-    ? Math.min(...agencyTreks.map((t) => t.price))
-    : null;
 
   return (
     <Link href={`/agency/${agency.slug}`} style={{ textDecoration: "none" }}>
@@ -102,18 +97,10 @@ export default function AgencyCard({ agency }: { agency: Agency }) {
               <span style={{ color: "var(--wr-text)", fontSize: 14, fontWeight: 600 }}>{agency.rating}</span>
               <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>({agency.reviewCount} reviews)</span>
             </div>
-            {startingPrice !== null && (
-              <div>
-                <span style={{ color: "var(--wr-text-faint)", fontSize: 11 }}>from </span>
-                <span style={{ color: "var(--wr-green)", fontSize: 14, fontWeight: 700 }}>
-                  ₹{startingPrice.toLocaleString("en-IN")}
-                </span>
-              </div>
-            )}
           </div>
 
           <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>Since {agency.foundedYear} · {agencyTreks.length} treks</span>
+            <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>Since {agency.foundedYear}</span>
             <span style={{ color: "var(--wr-green)", fontSize: 13, fontWeight: 500 }}>View →</span>
           </div>
         </div>
