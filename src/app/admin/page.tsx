@@ -1294,14 +1294,14 @@ function LeadsPanel() {
                     </div>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "6px 20px", marginBottom: 10 }}>
-                      <p style={{ color: "#888", fontSize: 12, margin: 0 }}>📧 <a href={`mailto:${lead.email}`} style={{ color: "#1D9E75" }}>{String(lead.email || "—")}</a></p>
-                      {lead.phone && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>📞 {String(lead.phone)}</p>}
-                      {lead.group_size && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>👥 {String(lead.group_size)} person(s)</p>}
-                      {lead.trek_title && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>🥾 {String(lead.trek_title)}</p>}
-                      {lead.agency_name && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>🏢 {String(lead.agency_name)}</p>}
+                      <p style={{ color: "#888", fontSize: 12, margin: 0 }}>📧 <a href={`mailto:${String(lead.email || "")}`} style={{ color: "#1D9E75" }}>{String(lead.email || "—")}</a></p>
+                      {lead.phone != null && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>📞 {String(lead.phone)}</p>}
+                      {lead.group_size != null && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>👥 {String(lead.group_size)} person(s)</p>}
+                      {lead.trek_title != null && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>🥾 {String(lead.trek_title)}</p>}
+                      {lead.agency_name != null && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>🏢 {String(lead.agency_name)}</p>}
                     </div>
 
-                    {lead.message && (
+                    {lead.message != null && (
                       <p style={{ color: "#666", fontSize: 12, fontStyle: "italic", margin: 0 }}>"{String(lead.message)}"</p>
                     )}
                   </div>
