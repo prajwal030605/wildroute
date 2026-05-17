@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Email admin with lead details
     await resend.emails.send({
-      from: "WildRoute Leads <onboarding@resend.dev>",
+      from: "WildRoute Leads <team@gowildroute.com>",
       to: [ADMIN_EMAIL],
       subject: `🔔 New Lead — ${trekTitle || agencyName || "WildRoute"} (${name})`,
       html: `
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Confirmation email to user
     await resend.emails.send({
-      from: "WildRoute <onboarding@resend.dev>",
+      from: "WildRoute <team@gowildroute.com>",
       to: [email],
       subject: `✅ Your enquiry is received — ${trekTitle || agencyName || "WildRoute"}`,
       html: `
