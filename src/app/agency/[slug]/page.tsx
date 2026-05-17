@@ -193,32 +193,17 @@ export default async function AgencyPage({ params }: { params: Promise<{ slug: s
               borderRadius: 16, padding: 24, marginBottom: 16,
               transition: "background 0.2s, border-color 0.2s",
             }}>
-              <h3 style={{ color: "var(--wr-text)", fontSize: 15, fontWeight: 600, marginBottom: 20 }}>Contact agency</h3>
-
-              <a href={`mailto:${agency.email}`} style={{
+              <h3 style={{ color: "var(--wr-text)", fontSize: 15, fontWeight: 600, marginBottom: 8 }}>Contact agency</h3>
+              <p style={{ color: "var(--wr-text-faint)", fontSize: 12, marginBottom: 16 }}>
+                Fill the enquiry form — our team reviews and connects you within 24 hours.
+              </p>
+              <div style={{
                 display: "flex", alignItems: "center", gap: 10,
-                background: "var(--wr-green)", color: "#fff", padding: "12px 16px",
-                borderRadius: 10, textDecoration: "none", fontSize: 14, fontWeight: 500, marginBottom: 10,
+                background: "var(--wr-green-bg)", color: "var(--wr-text-muted)", padding: "12px 16px",
+                borderRadius: 10, fontSize: 13, border: "1px solid var(--wr-green-border)",
               }}>
-                ✉️ Send enquiry
-              </a>
-
-              <a href={`tel:${agency.phone}`} style={{
-                display: "flex", alignItems: "center", gap: 10,
-                background: "var(--wr-green-bg)", color: "var(--wr-green)", padding: "12px 16px",
-                borderRadius: 10, textDecoration: "none", fontSize: 14, fontWeight: 500,
-                border: "1px solid var(--wr-green-border)",
-              }}>
-                📞 {agency.phone}
-              </a>
-
-              {agency.website && (
-                <a href={agency.website} target="_blank" rel="noopener noreferrer" style={{
-                  display: "block", textAlign: "center", color: "var(--wr-text-faint)", fontSize: 12, marginTop: 12, textDecoration: "none",
-                }}>
-                  🌐 Visit website →
-                </a>
-              )}
+                🔒 Contact details shared after enquiry review
+              </div>
             </div>
 
             {/* Enquiry form */}
