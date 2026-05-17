@@ -100,6 +100,34 @@ export default function Footer() {
               Join as agency →
             </Link>
           </div>
+
+          {/* Contact & Support */}
+          <div>
+            <p style={{ color: "var(--wr-text)", fontSize: 13, fontWeight: 600, marginBottom: 16 }}>Customer Support</p>
+            <a href="tel:+918273820633" style={{
+              display: "flex", alignItems: "center", gap: 8,
+              color: "var(--wr-green)", fontSize: 14, fontWeight: 700,
+              textDecoration: "none", marginBottom: 8,
+            }}>
+              📞 +91 82738 20633
+            </a>
+            <a href="mailto:support@gowildroute.com" style={{
+              display: "flex", alignItems: "center", gap: 8,
+              color: "var(--wr-text-faint)", fontSize: 13, textDecoration: "none", marginBottom: 6,
+            }}
+              onMouseEnter={e => (e.currentTarget.style.color = "var(--wr-green)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "var(--wr-text-faint)")}>
+              ✉ support@gowildroute.com
+            </a>
+            <a href="https://wa.me/918273820633" target="_blank" rel="noopener noreferrer" style={{
+              display: "inline-flex", alignItems: "center", gap: 6, marginTop: 10,
+              background: "#1a2e1a", border: "1px solid #1D9E75",
+              color: "var(--wr-green)", padding: "7px 14px", borderRadius: 8,
+              fontSize: 12, fontWeight: 600, textDecoration: "none",
+            }}>
+              💬 Chat on WhatsApp
+            </a>
+          </div>
         </div>
 
         <div style={{
