@@ -59,25 +59,32 @@ export default function Home() {
       if (tCount !== null) setTrekkerCount(tCount);
       if (aCount !== null) setAgencyCount(aCount);
 
-      // Featured agencies from Supabase (top 3 verified)
+      // Featured agencies — only admin-approved (verified = true, onboarding complete)
       const { data: agencyRows } = await supabase
         .from("agencies_directory")
         .select("*")
         .eq("verified", true)
+        .eq("onboarding_complete", true)
         .limit(3);
       if (agencyRows) setFeaturedAgencies(agencyRows.map(mapAgency));
 
-      // Featured treks from Supabase (latest 4)
+      // Featured treks — only from verified agencies, with a real price > 0
+      const verifiedEmails = new Set((agencyRows || []).map((a) => String(a.email)));
       const { data: trekRows } = await supabase
         .from("agency_treks")
         .select("*")
-        .order("created_at", { ascending: false })
-        .limit(4);
+        .order("created_at", { ascending: false });
       if (trekRows && agencyRows) {
-        const mappedTreks = trekRows.map((tRow) => {
-          const agencyRow = agencyRows.find((a) => a.email === tRow.agency_email) || agencyRows[0];
-          return mapTrek(tRow, agencyRow);
-        });
+        const mappedTreks = trekRows
+          .filter((tRow) =>
+            verifiedEmails.has(String(tRow.agency_email)) &&
+            Number(tRow.price_per_person) > 0
+          )
+          .slice(0, 4)
+          .map((tRow) => {
+            const agencyRow = agencyRows.find((a) => String(a.email) === String(tRow.agency_email));
+            return mapTrek(tRow, agencyRow);
+          });
         setFeaturedTreks(mappedTreks);
       }
     }
