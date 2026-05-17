@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     // Email to the agency with lead details
     const { error: emailError } = await resend.emails.send({
-      from: "WildRoute Leads <onboarding@resend.dev>",
+      from: "WildRoute Leads <team@gowildroute.com>",
       to: [agencyEmail],
       subject: `🔥 New Customer Lead — ${trekTitle || "WildRoute"} (${leadName})`,
       html: `
