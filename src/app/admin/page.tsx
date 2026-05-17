@@ -1145,7 +1145,192 @@ function IncompleteOnboardings() {
 }
 
 // ── Main Admin Page ──
-type Section = "add-agency" | "list-agencies" | "add-trek" | "list-treks" | "incomplete";
+// ── Leads Panel ──
+function LeadsPanel() {
+  const [leads, setLeads] = useState<Array<Record<string, unknown>>>([]);
+  const [loading, setLoading] = useState(false);
+  const [fetched, setFetched] = useState(false);
+  const [filter, setFilter] = useState<"all" | "new" | "forwarded">("all");
+  const [forwarding, setForwarding] = useState<string | null>(null);
+  const [forwardedSet, setForwardedSet] = useState<Set<string>>(new Set());
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  async function fetchLeads() {
+    setLoading(true);
+    const { data } = await supabase
+      .from("enquiries")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setLeads(data || []);
+    setLoading(false);
+    setFetched(true);
+  }
+
+  async function forwardLead(lead: Record<string, unknown>) {
+    const leadId = String(lead.id);
+    setForwarding(leadId);
+    setError(""); setSuccess("");
+
+    // Fetch agency email from agencies_directory using agency_email on the lead
+    const { data: agencyRow } = await supabase
+      .from("agencies_directory")
+      .select("email, agency_name")
+      .eq("email", String(lead.agency_email || ""))
+      .maybeSingle();
+
+    const agencyEmail = agencyRow?.email ? String(agencyRow.email) : String(lead.agency_email || "");
+    const agencyName = agencyRow?.agency_name ? String(agencyRow.agency_name) : String(lead.agency_name || "");
+
+    if (!agencyEmail) {
+      setError("No agency email found for this lead.");
+      setForwarding(null);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/forward-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          leadId,
+          agencyEmail,
+          agencyName,
+          leadName: String(lead.name || ""),
+          leadEmail: String(lead.email || ""),
+          leadPhone: lead.phone ? String(lead.phone) : null,
+          message: lead.message ? String(lead.message) : null,
+          groupSize: lead.group_size,
+          trekTitle: lead.trek_title ? String(lead.trek_title) : null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError("Forward failed: " + (data.error || "Unknown error"));
+      } else {
+        setForwardedSet(prev => new Set(prev).add(leadId));
+        setSuccess(`Lead forwarded to ${agencyName || agencyEmail} ✓`);
+        setLeads(prev => prev.map(l => String(l.id) === leadId ? { ...l, status: "forwarded" } : l));
+      }
+    } catch {
+      setError("Failed to forward lead.");
+    } finally {
+      setForwarding(null);
+    }
+  }
+
+  const displayLeads = leads.filter(l => {
+    if (filter === "new") return String(l.status || "new") === "new";
+    if (filter === "forwarded") return String(l.status) === "forwarded";
+    return true;
+  });
+
+  const newCount = leads.filter(l => String(l.status || "new") === "new").length;
+
+  if (!fetched) return (
+    <div style={{ textAlign: "center", paddingTop: 80 }}>
+      <p style={{ color: "#555", fontSize: 15, marginBottom: 20 }}>Load all customer enquiries and leads.</p>
+      <button onClick={fetchLeads} style={{ background: "#1D9E75", color: "#fff", border: "none", borderRadius: 10, padding: "12px 24px", fontSize: 14, cursor: "pointer" }}>Load leads</button>
+    </div>
+  );
+
+  if (loading) return <div style={{ color: "#555", textAlign: "center", paddingTop: 80 }}>Loading...</div>;
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <div>
+          <h1 style={{ color: "#fff", fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Customer Leads</h1>
+          <p style={{ color: "#555", fontSize: 14 }}>{leads.length} total · {newCount} new awaiting action</p>
+        </div>
+        <button onClick={fetchLeads} style={{ background: "transparent", color: "#1D9E75", border: "1px solid #1D9E75", borderRadius: 8, padding: "8px 16px", fontSize: 13, cursor: "pointer" }}>Refresh</button>
+      </div>
+
+      {error && <div style={{ background: "#2A0F0F", border: "1px solid #EF4444", borderRadius: 8, padding: "10px 14px", marginBottom: 16 }}><p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>⚠ {error}</p></div>}
+      {success && <div style={{ background: "#0F2A1E", border: "1px solid #1D9E75", borderRadius: 8, padding: "10px 14px", marginBottom: 16 }}><p style={{ color: "#1D9E75", fontSize: 13, margin: 0 }}>✓ {success}</p></div>}
+
+      {/* Filter */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        {(["all", "new", "forwarded"] as const).map(f => (
+          <button key={f} onClick={() => setFilter(f)} style={{
+            background: filter === f ? "#1D9E75" : "transparent",
+            color: filter === f ? "#fff" : "#666",
+            border: `1px solid ${filter === f ? "#1D9E75" : "#222"}`,
+            borderRadius: 8, padding: "6px 14px", fontSize: 12, cursor: "pointer", fontWeight: 500,
+          }}>
+            {f === "all" ? `All (${leads.length})` : f === "new" ? `New (${newCount})` : `Forwarded (${leads.length - newCount})`}
+          </button>
+        ))}
+      </div>
+
+      {displayLeads.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "60px 0", color: "#444" }}>No leads found.</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {displayLeads.map((lead) => {
+            const leadId = String(lead.id);
+            const isForwarded = String(lead.status) === "forwarded" || forwardedSet.has(leadId);
+            const isForwarding = forwarding === leadId;
+            return (
+              <div key={leadId} style={{
+                background: "#111", border: `1px solid ${isForwarded ? "#1a1a1a" : "#1D9E75"}`,
+                borderRadius: 12, padding: "18px 20px",
+                opacity: isForwarded ? 0.7 : 1,
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                      <span style={{
+                        background: isForwarded ? "#1a1a1a" : "#0F2A1E",
+                        color: isForwarded ? "#555" : "#1D9E75",
+                        fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 20, letterSpacing: "0.05em",
+                      }}>
+                        {isForwarded ? "FORWARDED" : "NEW"}
+                      </span>
+                      <span style={{ color: "#fff", fontSize: 15, fontWeight: 600 }}>{String(lead.name || "—")}</span>
+                      <span style={{ color: "#555", fontSize: 12 }}>
+                        {lead.created_at ? new Date(String(lead.created_at)).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "6px 20px", marginBottom: 10 }}>
+                      <p style={{ color: "#888", fontSize: 12, margin: 0 }}>📧 <a href={`mailto:${lead.email}`} style={{ color: "#1D9E75" }}>{String(lead.email || "—")}</a></p>
+                      {lead.phone && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>📞 {String(lead.phone)}</p>}
+                      {lead.group_size && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>👥 {String(lead.group_size)} person(s)</p>}
+                      {lead.trek_title && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>🥾 {String(lead.trek_title)}</p>}
+                      {lead.agency_name && <p style={{ color: "#888", fontSize: 12, margin: 0 }}>🏢 {String(lead.agency_name)}</p>}
+                    </div>
+
+                    {lead.message && (
+                      <p style={{ color: "#666", fontSize: 12, fontStyle: "italic", margin: 0 }}>"{String(lead.message)}"</p>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => !isForwarded && forwardLead(lead)}
+                    disabled={isForwarded || isForwarding}
+                    style={{
+                      background: isForwarded ? "transparent" : "#1D9E75",
+                      color: isForwarded ? "#444" : "#fff",
+                      border: isForwarded ? "1px solid #222" : "none",
+                      borderRadius: 8, padding: "10px 18px", fontSize: 13, fontWeight: 600,
+                      cursor: isForwarded ? "not-allowed" : "pointer",
+                      whiteSpace: "nowrap", flexShrink: 0,
+                    }}
+                  >
+                    {isForwarding ? "Sending..." : isForwarded ? "✓ Sent" : "Forward to Agency →"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+type Section = "add-agency" | "list-agencies" | "add-trek" | "list-treks" | "incomplete" | "leads";
 
 const sidebarItems: { id: Section; label: string; icon: string; group: string }[] = [
   { id: "add-agency", label: "Add agency", icon: "+", group: "Agencies" },
@@ -1153,6 +1338,7 @@ const sidebarItems: { id: Section; label: string; icon: string; group: string }[
   { id: "incomplete", label: "Incomplete", icon: "⚠", group: "Agencies" },
   { id: "add-trek", label: "Add trek", icon: "+", group: "Treks" },
   { id: "list-treks", label: "All treks", icon: "≡", group: "Treks" },
+  { id: "leads", label: "Leads", icon: "🔔", group: "Leads" },
 ];
 
 export default function AdminPage() {
@@ -1179,7 +1365,7 @@ export default function AdminPage() {
   }
   if (!unlocked) return <AdminAccessGate reason={gateReason} onUnlock={() => setUnlocked(true)} />;
 
-  const groups = ["Agencies", "Treks"];
+  const groups = ["Agencies", "Treks", "Leads"];
 
   return (
     <div style={{ background: "#0a0a0a", minHeight: "100vh", fontFamily: "sans-serif" }}>
@@ -1238,6 +1424,7 @@ export default function AdminPage() {
           {activeSection === "incomplete" && <IncompleteOnboardings />}
           {activeSection === "add-trek" && <AddTrekForm />}
           {activeSection === "list-treks" && <TrekList />}
+          {activeSection === "leads" && <LeadsPanel />}
         </main>
       </div>
     </div>

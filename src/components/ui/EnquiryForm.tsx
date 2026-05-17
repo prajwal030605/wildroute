@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 
 export default function EnquiryForm({
   trekTitle,
@@ -25,22 +24,30 @@ export default function EnquiryForm({
     if (!name || !email) { setError("Name and email are required."); return; }
     setError(""); setSubmitting(true);
 
-    const { error: sbError } = await supabase.from("enquiries").insert([{
-      name,
-      email,
-      phone: phone || null,
-      message: message || null,
-      group_size: parseInt(groupSize),
-      trek_title: trekTitle || null,
-      agency_email: agencyEmail || null,
-      agency_name: agencyName || null,
-    }]);
-
-    setSubmitting(false);
-    if (sbError) {
+    try {
+      const res = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name, email,
+          phone: phone || null,
+          message: message || null,
+          groupSize,
+          trekTitle: trekTitle || null,
+          agencyEmail: agencyEmail || null,
+          agencyName: agencyName || null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Something went wrong. Please try again.");
+      } else {
+        setSubmitted(true);
+      }
+    } catch {
       setError("Something went wrong. Please try again.");
-    } else {
-      setSubmitted(true);
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -71,9 +78,12 @@ export default function EnquiryForm({
             <path d="M4 10l4.5 4.5 7.5-9" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h3 style={{ color: "var(--wr-text)", fontSize: 15, fontWeight: 600, marginBottom: 6 }}>Enquiry sent!</h3>
-        <p style={{ color: "var(--wr-green)", fontSize: 13 }}>
-          {agencyName || "The agency"} will get back to you within 24 hours.
+        <h3 style={{ color: "var(--wr-text)", fontSize: 15, fontWeight: 600, marginBottom: 6 }}>Enquiry received!</h3>
+        <p style={{ color: "var(--wr-text-muted)", fontSize: 13, marginBottom: 4 }}>
+          Our team will review and connect you with {agencyName || "the agency"}.
+        </p>
+        <p style={{ color: "var(--wr-green)", fontSize: 13, fontWeight: 500 }}>
+          ✓ Expect a response within 24 hours
         </p>
       </div>
     );
@@ -136,7 +146,7 @@ export default function EnquiryForm({
           {submitting ? "Sending..." : "Send enquiry →"}
         </button>
         <p style={{ color: "var(--wr-text-faint)", fontSize: 11, textAlign: "center" }}>
-          Free to enquire · No commitment
+          Free to enquire · WildRoute reviews before connecting you
         </p>
       </form>
     </div>
