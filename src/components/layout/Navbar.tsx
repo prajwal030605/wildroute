@@ -9,6 +9,7 @@ import { useTheme } from "@/components/providers/ThemeProvider";
 export default function Navbar() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [session, setSession] = useState<WildRouteSession | null>(null);
   const { theme, toggleTheme } = useTheme();
 
@@ -69,15 +70,83 @@ export default function Navbar() {
                   Dashboard
                 </Link>
               )}
-              <button
-                type="button"
-                onClick={logout}
-                style={{ background: "none", border: "none", color: "var(--wr-text-muted)", fontSize: 14, cursor: "pointer", padding: 0 }}
-                onMouseEnter={e => (e.currentTarget.style.color = "var(--wr-text)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "var(--wr-text-muted)")}
-              >
-                Log out
-              </button>
+              {session.role === "agency" && (
+                <div style={{ position: "relative" }}>
+                  <button
+                    type="button"
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 8,
+                      background: "var(--wr-card)", border: "1px solid var(--wr-border)",
+                      borderRadius: 20, padding: "6px 12px 6px 6px",
+                      cursor: "pointer", transition: "border-color 0.2s",
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--wr-green)")}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--wr-border)")}
+                  >
+                    <div style={{
+                      width: 28, height: 28, borderRadius: "50%", background: "var(--wr-green)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#fff", fontWeight: 700, fontSize: 13, flexShrink: 0,
+                    }}>
+                      {session.email.charAt(0).toUpperCase()}
+                    </div>
+                    <span style={{ color: "var(--wr-text)", fontSize: 13, fontWeight: 500 }}>My Agency</span>
+                    <span style={{ color: "var(--wr-text-muted)", fontSize: 10 }}>{profileOpen ? "▲" : "▼"}</span>
+                  </button>
+
+                  {profileOpen && (
+                    <div style={{
+                      position: "absolute", top: "calc(100% + 10px)", right: 0,
+                      background: "var(--wr-card)", border: "1px solid var(--wr-border)",
+                      borderRadius: 14, padding: 8, minWidth: 200,
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.4)", zIndex: 200,
+                    }}>
+                      <p style={{ color: "var(--wr-text-muted)", fontSize: 11, padding: "6px 12px", margin: 0, letterSpacing: "0.05em" }}>
+                        {session.email}
+                      </p>
+                      <div style={{ height: 1, background: "var(--wr-border)", margin: "6px 0" }} />
+                      <Link href="/agency/dashboard"
+                        onClick={() => setProfileOpen(false)}
+                        style={{ display: "block", padding: "9px 12px", color: "var(--wr-text)", fontSize: 13, textDecoration: "none", borderRadius: 8 }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "var(--wr-card-hover)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        🏔 My Treks
+                      </Link>
+                      <Link href="/register/agency/onboarding"
+                        onClick={() => setProfileOpen(false)}
+                        style={{ display: "block", padding: "9px 12px", color: "var(--wr-green)", fontSize: 13, textDecoration: "none", borderRadius: 8, fontWeight: 500 }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "var(--wr-card-hover)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        + Add Activity
+                      </Link>
+                      <div style={{ height: 1, background: "var(--wr-border)", margin: "6px 0" }} />
+                      <button type="button" onClick={logout} style={{
+                        display: "block", width: "100%", padding: "9px 12px", color: "#EF4444",
+                        fontSize: 13, background: "none", border: "none", cursor: "pointer", textAlign: "left", borderRadius: 8,
+                      }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "var(--wr-card-hover)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        Log out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+              {session.role !== "agency" && (
+                <button
+                  type="button"
+                  onClick={logout}
+                  style={{ background: "none", border: "none", color: "var(--wr-text-muted)", fontSize: 14, cursor: "pointer", padding: 0 }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "var(--wr-text)")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "var(--wr-text-muted)")}
+                >
+                  Log out
+                </button>
+              )}
             </>
           ) : (
             <Link href="/register" style={{ color: "var(--wr-text-muted)", fontSize: 14, textDecoration: "none" }}
