@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import { supabase } from "@/lib/supabase";
 import { getSession, setSession } from "@/lib/auth-session";
+import { SingleImageUpload, MultiImageUpload } from "@/components/ui/ImageUpload";
 import type { ActivityType } from "@/types";
 
 /* ── constants ── */
@@ -96,13 +97,13 @@ export default function AgencyOnboardingPage() {
 
   /* ── Page 2: Trek Details ── */
   const [trekName, setTrekName] = useState("");
-  const [trekPhotos, setTrekPhotos] = useState("");
+  const [trekPhotos, setTrekPhotos] = useState<string[]>([]);
   const [trekDescription, setTrekDescription] = useState("");
   const [trekArea, setTrekArea] = useState("");
   const [trekAltitude, setTrekAltitude] = useState("");
   const [trekDuration, setTrekDuration] = useState("");
   const [itinerary, setItinerary] = useState("");
-  const [pastTrekPhotos, setPastTrekPhotos] = useState("");
+  const [pastTrekPhotos, setPastTrekPhotos] = useState<string[]>([]);
   const [pastTrekCount, setPastTrekCount] = useState("");
   const [trekInclusions, setTrekInclusions] = useState("");
   const [trekExclusions, setTrekExclusions] = useState("");
@@ -256,13 +257,13 @@ export default function AgencyOnboardingPage() {
         registration_id: registrationId,
         trek_name: trekName.trim(),
         trek_slug: trekSlug,
-        trek_photos: trekPhotos.split("\n").map(u => u.trim()).filter(Boolean),
+        trek_photos: trekPhotos,
         trek_description: trekDescription.trim(),
         trek_area: trekArea.trim(),
         trek_altitude: trekAltitude.trim(),
         trek_duration: trekDuration.trim(),
         itinerary: itinerary.trim(),
-        past_trek_photos: pastTrekPhotos.split("\n").map(u => u.trim()).filter(Boolean),
+        past_trek_photos: pastTrekPhotos,
         past_trek_count: pastTrekCount ? parseInt(pastTrekCount, 10) : 0,
         inclusions: trekInclusions.split("\n").map(l => l.trim()).filter(Boolean),
         exclusions: trekExclusions.split("\n").map(l => l.trim()).filter(Boolean),
@@ -423,9 +424,9 @@ export default function AgencyOnboardingPage() {
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
             <button type="button" onClick={() => {
               // Reset only trek & pricing fields, keep agency data, go to Step 2
-              setTrekName(""); setTrekPhotos(""); setTrekDescription("");
+              setTrekName(""); setTrekPhotos([]); setTrekDescription("");
               setTrekArea(""); setTrekAltitude(""); setTrekDuration("");
-              setItinerary(""); setPastTrekPhotos(""); setPastTrekCount("");
+              setItinerary(""); setPastTrekPhotos([]); setPastTrekCount("");
               setTrekInclusions(""); setTrekExclusions(""); setGoogleReviewsLink("");
               setPricePerPerson(""); setDiscountPercent(""); setDiscountNote("");
               setIncludesStay(false); setStayType(""); setIncludesFood(false);
@@ -599,9 +600,12 @@ export default function AgencyOnboardingPage() {
                       </div>
                     </div>
                     <div>
-                      <label style={labelStyle}>Cover Image URL</label>
-                      <input type="url" placeholder="https://images.unsplash.com/..." value={coverImage} onChange={e => setCoverImage(e.target.value)} style={inputStyle} />
-                      <p style={{ color: "#444", fontSize: 11, marginTop: 4 }}>Landscape image recommended (1200x600+).</p>
+                      <SingleImageUpload
+                        label="COVER IMAGE"
+                        placeholder="Upload agency cover photo"
+                        value={coverImage}
+                        onChange={setCoverImage}
+                      />
                     </div>
                   </div>
                 </div>
@@ -652,9 +656,12 @@ export default function AgencyOnboardingPage() {
 
                 {sectionTitle("PHOTOGRAPHS")}
                 <div>
-                  <label style={labelStyle}>Trek Photo URLs (one per line)</label>
-                  <textarea placeholder={"https://images.unsplash.com/photo-1.jpg\nhttps://images.unsplash.com/photo-2.jpg"} value={trekPhotos} onChange={e => setTrekPhotos(e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" as const }} />
-                  <p style={{ color: "#444", fontSize: 11, marginTop: 4 }}>Add image URLs showcasing this trek. One URL per line.</p>
+                  <MultiImageUpload
+                    label="TREK PHOTOS"
+                    value={trekPhotos}
+                    onChange={setTrekPhotos}
+                    max={8}
+                  />
                 </div>
 
                 {sectionTitle("ITINERARY")}
@@ -676,8 +683,12 @@ export default function AgencyOnboardingPage() {
                     <input type="number" placeholder="e.g. 45" value={pastTrekCount} onChange={e => setPastTrekCount(e.target.value)} style={inputStyle} />
                   </div>
                   <div>
-                    <label style={labelStyle}>Past trek photo URLs (one per line)</label>
-                    <textarea placeholder="URLs of photos from past batches" value={pastTrekPhotos} onChange={e => setPastTrekPhotos(e.target.value)} rows={2} style={{ ...inputStyle, resize: "vertical" as const }} />
+                    <MultiImageUpload
+                      label="PAST TREK PHOTOS"
+                      value={pastTrekPhotos}
+                      onChange={setPastTrekPhotos}
+                      max={6}
+                    />
                   </div>
                 </div>
 
