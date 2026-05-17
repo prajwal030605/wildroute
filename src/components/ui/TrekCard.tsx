@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { Trek } from "@/types";
-import { agencies } from "@/data/agencies";
 
 const difficultyColor: Record<string, string> = {
   easy: "#1D9E75",
@@ -22,7 +21,7 @@ const activityEmoji: Record<string, string> = {
 };
 
 export default function TrekCard({ trek }: { trek: Trek }) {
-  const agency = agencies.find((a) => a.id === trek.agencyId);
+  const agencyName = trek.agencyName;
 
   return (
     <Link href={`/trek/${trek.slug}`} style={{ textDecoration: "none" }}>
@@ -108,7 +107,7 @@ export default function TrekCard({ trek }: { trek: Trek }) {
           </div>
 
           {/* Agency */}
-          {agency && (
+          {agencyName && (
             <div style={{
               marginTop: 12, paddingTop: 12,
               borderTop: "1px solid var(--wr-border)",
@@ -120,8 +119,8 @@ export default function TrekCard({ trek }: { trek: Trek }) {
               }}>
                 <span style={{ color: "#fff", fontSize: 9, fontWeight: 700 }}>W</span>
               </div>
-              <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>{agency.name}</span>
-              {agency.verified && <span style={{ color: "var(--wr-green)", fontSize: 10 }}>✓ Verified</span>}
+              <span style={{ color: "var(--wr-text-faint)", fontSize: 12 }}>{agencyName}</span>
+              <span style={{ color: "var(--wr-green)", fontSize: 10 }}>✓ Verified</span>
             </div>
           )}
         </div>

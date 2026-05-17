@@ -7,8 +7,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import TrekCard from "@/components/ui/TrekCard";
 import AgencyCard from "@/components/ui/AgencyCard";
-import { treks } from "@/data/treks";
-import { agencies } from "@/data/agencies";
+import { mapAgency, mapTrek } from "@/lib/supabase-data";
+import type { Trek, Agency } from "@/types";
 
 const activities = [
   { label: "Trekking", emoji: "🥾", type: "trekking" },
@@ -44,19 +44,44 @@ export default function Home() {
   const [emailError, setEmailError] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewer, setViewer] = useState<WildRouteSession | null>(null);
+  const [featuredTreks, setFeaturedTreks] = useState<Trek[]>([]);
+  const [featuredAgencies, setFeaturedAgencies] = useState<Agency[]>([]);
 
   useEffect(() => {
     setViewer(getSession());
   }, []);
 
   useEffect(() => {
-    async function fetchCounts() {
+    async function fetchAll() {
+      // Waitlist counts
       const { count: tCount } = await supabase.from("trekkers").select("*", { count: "exact", head: true });
       const { count: aCount } = await supabase.from("agencies").select("*", { count: "exact", head: true });
       if (tCount !== null) setTrekkerCount(tCount);
       if (aCount !== null) setAgencyCount(aCount);
+
+      // Featured agencies from Supabase (top 3 verified)
+      const { data: agencyRows } = await supabase
+        .from("agencies_directory")
+        .select("*")
+        .eq("verified", true)
+        .limit(3);
+      if (agencyRows) setFeaturedAgencies(agencyRows.map(mapAgency));
+
+      // Featured treks from Supabase (latest 4)
+      const { data: trekRows } = await supabase
+        .from("agency_treks")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(4);
+      if (trekRows && agencyRows) {
+        const mappedTreks = trekRows.map((tRow) => {
+          const agencyRow = agencyRows.find((a) => a.email === tRow.agency_email) || agencyRows[0];
+          return mapTrek(tRow, agencyRow);
+        });
+        setFeaturedTreks(mappedTreks);
+      }
     }
-    fetchCounts();
+    fetchAll();
   }, []);
 
   function validateEmail(email: string) {
@@ -75,9 +100,6 @@ export default function Home() {
     const { error } = await supabase.from("agencies_waitlist").insert([{ email: agencyEmail, name: agencyName }]);
     if (!error) { setAgencyCount((c) => c + 1); setSubmittedType("agency"); setSubmitted(true); }
   }
-
-  const featuredTreks = treks.slice(0, 4);
-  const featuredAgencies = agencies.slice(0, 3);
 
   return (
     <main style={{ background: "var(--wr-bg)", minHeight: "100vh", fontFamily: "sans-serif", transition: "background 0.2s" }}>
