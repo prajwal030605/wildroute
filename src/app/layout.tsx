@@ -37,6 +37,14 @@ export const metadata: Metadata = {
   authors: [{ name: "WildRoute", url: "https://gowildroute.com" }],
   creator: "WildRoute",
   metadataBase: new URL("https://gowildroute.com"),
+  icons: {
+    icon: [
+      { url: "/icon.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico", sizes: "48x48 32x32 16x16", type: "image/x-icon" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/favicon.ico",
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
